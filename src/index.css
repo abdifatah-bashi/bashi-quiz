@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-serif: "Cormorant Garamond", serif;
+  --font-poppins: "Poppins", sans-serif;
+  
+  --color-navy: #1E293B;
+  --color-accent: #1E293B;
+  --color-marigold: #FACC15;
+  --color-steel: #94A3B8;
+  --color-success: #10B981;
+  --color-error: #ef4444;
+}
+
+body {
+  @apply bg-[#f5f5f5] text-[#1E293B] overflow-hidden font-sans;
+  background-image: 
+    linear-gradient(rgba(30, 41, 59, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 41, 59, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.glass-card {
+  @apply bg-white/80 backdrop-blur-2xl border border-white/20 rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(30,41,59,0.1)];
+}
+
+.glass-button {
+  @apply relative overflow-hidden transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 1) 100%);
+  box-shadow: 0 20px 40px -12px rgba(30, 41, 59, 0.4);
+}
+
+.glass-button::before {
+  content: '';
+  @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+}
+
+.glass-button:hover::before {
+  @apply opacity-100;
+}
+
+.accent-glow {
+  filter: drop-shadow(0 8px 16px rgba(30, 41, 59, 0.2));
+}
+
+.neon-glow {
+  box-shadow: 0 0 50px rgba(30, 41, 59, 0.1);
+}
+
+.midnight-royal {
+  background: linear-gradient(135deg, #334155 0%, #1E293B 100%);
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
+.circular-timer {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.circular-timer svg {
+  transform: rotate(-90deg);
+}
+
+.circular-timer circle {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.circular-timer .bg {
+  stroke: rgba(30, 41, 59, 0.05);
+}
+
+.circular-timer .progress {
+  stroke: #1E293B;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+}
+
+.circular-timer .progress.warning {
+  stroke: #ef4444;
+}
