@@ -3,12 +3,14 @@ export interface Question {
   text: string;
   options: string[];
   correctIndex: number;
+  imageUrl?: string;
 }
 
 export interface QuestionSet {
   id: string;
   name: string;
   questions: Question[];
+  isUsed?: boolean;
 }
 
 export interface Student {

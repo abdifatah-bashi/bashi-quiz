@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Moon, User, Play, RotateCcw, CheckCircle2, XCircle, Timer, Star, ChevronRight, Settings, Save, Plus, Trash2, List, Loader2 } from 'lucide-react';
+import { Trophy, Moon, User, Play, RotateCcw, CheckCircle2, XCircle, Timer, Star, ChevronRight, Settings, Save, Plus, Trash2, List, Loader2, Image as ImageIcon, Upload, X, Users } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Question, Student, GameState, QuestionSet } from './types';
 import { cn } from './utils';
@@ -25,7 +25,8 @@ const createEmptyQuestion = (index: number): Question => ({
   id: `q-${Date.now()}-${index}`,
   text: '',
   options: ['', '', ''],
-  correctIndex: 0
+  correctIndex: 0,
+  imageUrl: undefined
 });
 
 const createEmptySet = (index: number): QuestionSet => ({
@@ -59,6 +60,9 @@ export default function App() {
   const [showNextButton, setShowNextButton] = useState(false);
   const [timeLeft, setTimeLeft] = useState(COUNTDOWN_TIME);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isAudienceActive, setIsAudienceActive] = useState(false);
+  const [audienceTimeLeft, setAudienceTimeLeft] = useState(30);
+  const audienceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -66,6 +70,29 @@ export default function App() {
       timerRef.current = null;
     }
   }, []);
+
+  const startAudienceTimer = () => {
+    stopTimer();
+    setIsAudienceActive(true);
+    setAudienceTimeLeft(30);
+    
+    if (audienceTimerRef.current) clearInterval(audienceTimerRef.current);
+    
+    audienceTimerRef.current = setInterval(() => {
+      setAudienceTimeLeft(prev => {
+        if (prev <= 1) {
+          if (audienceTimerRef.current) clearInterval(audienceTimerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const closeAudienceTimer = () => {
+    setIsAudienceActive(false);
+    if (audienceTimerRef.current) clearInterval(audienceTimerRef.current);
+  };
 
   const startTimer = useCallback(() => {
     stopTimer();
@@ -212,6 +239,22 @@ export default function App() {
   const saveSets = (newSets: QuestionSet[]) => {
     setQuestionSets(newSets);
     localStorage.setItem('ramadan_quiz_sets', JSON.stringify(newSets));
+  };
+
+  const handleImageUpload = (setIndex: number, qIndex: number, file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const newSets = [...questionSets];
+      newSets[setIndex].questions[qIndex].imageUrl = reader.result as string;
+      saveSets(newSets);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = (setIndex: number, qIndex: number) => {
+    const newSets = [...questionSets];
+    newSets[setIndex].questions[qIndex].imageUrl = undefined;
+    saveSets(newSets);
   };
 
   useEffect(() => {
@@ -375,18 +418,51 @@ export default function App() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {set.questions.map((q, qIndex) => (
                       <div key={q.id} className="p-4 rounded-2xl bg-white border border-navy/5 space-y-4">
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-navy/30">Question {qIndex + 1}</div>
-                        <input
-                          type="text"
-                          value={q.text}
-                          onChange={(e) => {
-                            const newSets = [...questionSets];
-                            newSets[setIndex].questions[qIndex].text = e.target.value;
-                            saveSets(newSets);
-                          }}
-                          placeholder="Question text..."
-                          className="w-full bg-navy/5 border border-navy/5 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-navy/20 font-medium text-navy"
-                        />
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-navy/30">Question {qIndex + 1}</div>
+                            <div className="flex items-center gap-2">
+                              <label className="cursor-pointer p-1.5 rounded-lg bg-navy/5 hover:bg-navy/10 transition-colors text-navy/40 hover:text-navy">
+                                <Upload className="w-3.5 h-3.5" />
+                                <input 
+                                  type="file" 
+                                  className="hidden" 
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleImageUpload(setIndex, qIndex, file);
+                                  }}
+                                />
+                              </label>
+                              {q.imageUrl && (
+                                <button 
+                                  onClick={() => removeImage(setIndex, qIndex)}
+                                  className="p-1.5 rounded-lg bg-error/5 hover:bg-error/10 transition-colors text-error/40 hover:text-error"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {q.imageUrl && (
+                            <div className="relative w-full h-24 rounded-xl overflow-hidden border border-navy/5 mb-2">
+                              <img src={q.imageUrl} className="w-full h-full object-cover" alt="Preview" referrerPolicy="no-referrer" />
+                            </div>
+                          )}
+
+                          <input
+                            type="text"
+                            value={q.text}
+                            onChange={(e) => {
+                              const newSets = [...questionSets];
+                              newSets[setIndex].questions[qIndex].text = e.target.value;
+                              saveSets(newSets);
+                            }}
+                            placeholder="Question text..."
+                            className="w-full bg-navy/5 border border-navy/5 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-navy/20 font-medium text-navy"
+                          />
+                        </div>
                         <div className="space-y-2">
                           {q.options.map((opt, oIndex) => (
                             <div key={oIndex} className="flex gap-2 items-center">
@@ -572,6 +648,21 @@ export default function App() {
               <h3 className="text-2xl font-bold leading-tight tracking-tight text-navy font-poppins">
                 {questions[currentQuestionIndex].text}
               </h3>
+
+              {questions[currentQuestionIndex].imageUrl && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 rounded-2xl overflow-hidden border border-navy/5 shadow-inner bg-navy/5"
+                >
+                  <img 
+                    src={questions[currentQuestionIndex].imageUrl} 
+                    alt="Question visual"
+                    className="w-full h-48 object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </motion.div>
+              )}
             </motion.div>
 
             {/* Options */}
@@ -614,19 +705,100 @@ export default function App() {
               })}
             </div>
 
-            {/* Next Button */}
+            {/* Lifelines & Next Button */}
+            <div className="flex gap-3">
+              <AnimatePresence mode="wait">
+                {!showNextButton && !isRevealing && !isWaiting && (
+                  <motion.button
+                    key="audience-btn"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    onClick={startAudienceTimer}
+                    className="flex-1 bg-marigold hover:bg-marigold/90 border border-marigold py-4 rounded-2xl font-bold text-navy uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-marigold/20"
+                  >
+                    <Users className="w-5 h-5" />
+                    i badbaadiya
+                  </motion.button>
+                )}
+
+                {showNextButton && (
+                  <motion.button
+                    key="next-btn"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    onClick={handleNext}
+                    className="flex-1 bg-navy py-4 rounded-2xl font-bold text-white uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-navy/20"
+                  >
+                    {currentQuestionIndex < 3 ? "Next Question" : "View Results"}
+                    <ChevronRight className="w-5 h-5" />
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Audience Timer Overlay */}
             <AnimatePresence>
-              {showNextButton && (
-                <motion.button
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  onClick={handleNext}
-                  className="w-full bg-navy py-4 rounded-2xl font-bold text-white uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-navy/20"
+              {isAudienceActive && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-navy/95 backdrop-blur-xl"
                 >
-                  {currentQuestionIndex < 3 ? "Next Question" : "View Results"}
-                  <ChevronRight className="w-5 h-5" />
-                </motion.button>
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="scan-line opacity-20" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(250,204,21,0.05)_0%,transparent_70%)]" />
+                  </div>
+
+                  <motion.div
+                    initial={{ scale: 0.9, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0.9, y: 20 }}
+                    className="w-full max-w-sm glass-card p-10 text-center space-y-8 relative border-marigold/20"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex justify-center">
+                        <div className="w-16 h-16 rounded-2xl midnight-royal flex items-center justify-center shadow-lg shadow-navy/40">
+                          <Users className="w-8 h-8 text-marigold" />
+                        </div>
+                      </div>
+                      <h2 className="text-2xl font-bold text-navy font-poppins uppercase tracking-tight">i badbaadiya</h2>
+                      <p className="text-xs font-bold text-navy/40 uppercase tracking-[0.2em]">Lifeline Active</p>
+                    </div>
+
+                    <div className="relative py-8">
+                      <div className="text-7xl font-black font-mono text-navy tabular-nums">
+                        {audienceTimeLeft}
+                        <span className="text-xl opacity-20 ml-1">s</span>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="mt-6 h-1.5 w-full bg-navy/5 rounded-full overflow-hidden">
+                        <motion.div 
+                          className="h-full bg-marigold"
+                          initial={{ width: "100%" }}
+                          animate={{ width: `${(audienceTimeLeft / 30) * 100}%` }}
+                          transition={{ duration: 1, ease: "linear" }}
+                        />
+                      </div>
+                    </div>
+
+                    <p className="text-sm font-medium text-navy/60 leading-relaxed">
+                      The audience is now voting. <br/>
+                      <span className="text-navy font-bold">Please wait for the results...</span>
+                    </p>
+
+                    <button
+                      onClick={closeAudienceTimer}
+                      className="w-full bg-navy text-white py-4 rounded-2xl font-bold uppercase tracking-widest hover:bg-navy/90 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-navy/20"
+                    >
+                      <X className="w-5 h-5" />
+                      Close & Answer
+                    </button>
+                  </motion.div>
+                </motion.div>
               )}
             </AnimatePresence>
           </motion.div>
