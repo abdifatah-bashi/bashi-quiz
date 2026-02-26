@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Moon, User, Play, RotateCcw, CheckCircle2, XCircle, Timer, Star, ChevronRight, Settings, Save, Plus, Trash2, List } from 'lucide-react';
+import { Trophy, Moon, User, Play, RotateCcw, CheckCircle2, XCircle, Timer, Star, ChevronRight, Settings, Save, Plus, Trash2, List, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Question, Student, GameState, QuestionSet } from './types';
 import { cn } from './utils';
@@ -54,6 +54,7 @@ export default function App() {
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [isWaiting, setIsWaiting] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
   const [showNextButton, setShowNextButton] = useState(false);
   const [timeLeft, setTimeLeft] = useState(COUNTDOWN_TIME);
@@ -91,28 +92,34 @@ export default function App() {
   }, [stopTimer]);
 
   const handleTimeout = () => {
-    if (isRevealing) return;
-    setIsRevealing(true);
+    if (isRevealing || isWaiting) return;
+    setIsWaiting(true);
     setSelectedOption(-1);
-    soundService.playWrong();
 
     setTimeout(() => {
-      setStudent(prev => {
-        const newAnswers = [...prev.answers];
-        newAnswers[currentQuestionIndex] = false;
-        return {
-          ...prev,
-          answers: newAnswers,
-        };
-      });
-      setShowNextButton(true);
-    }, 1000);
+      setIsWaiting(false);
+      setIsRevealing(true);
+      soundService.playWrong();
+
+      setTimeout(() => {
+        setStudent(prev => {
+          const newAnswers = [...prev.answers];
+          newAnswers[currentQuestionIndex] = false;
+          return {
+            ...prev,
+            answers: newAnswers,
+          };
+        });
+        setShowNextButton(true);
+      }, 1000);
+    }, 2500);
   };
 
   const handleNext = () => {
     if (currentQuestionIndex < 3) {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedOption(null);
+      setIsWaiting(false);
       setIsRevealing(false);
       setShowNextButton(false);
       startTimer();
@@ -142,31 +149,37 @@ export default function App() {
   };
 
   const handleAnswer = (index: number) => {
-    if (isRevealing) return;
+    if (isRevealing || isWaiting) return;
     stopTimer();
     setSelectedOption(index);
-    setIsRevealing(true);
+    setIsWaiting(true);
 
     const isCorrect = index === questions[currentQuestionIndex].correctIndex;
     
-    if (isCorrect) {
-      soundService.playCorrect();
-    } else {
-      soundService.playWrong();
-    }
-    
+    // Suspense delay
     setTimeout(() => {
-      setStudent(prev => {
-        const newAnswers = [...prev.answers];
-        newAnswers[currentQuestionIndex] = isCorrect;
-        return {
-          ...prev,
-          score: isCorrect ? prev.score + 1 : prev.score,
-          answers: newAnswers,
-        };
-      });
-      setShowNextButton(true);
-    }, 1000);
+      setIsWaiting(false);
+      setIsRevealing(true);
+      
+      if (isCorrect) {
+        soundService.playCorrect();
+      } else {
+        soundService.playWrong();
+      }
+      
+      setTimeout(() => {
+        setStudent(prev => {
+          const newAnswers = [...prev.answers];
+          newAnswers[currentQuestionIndex] = isCorrect;
+          return {
+            ...prev,
+            score: isCorrect ? prev.score + 1 : prev.score,
+            answers: newAnswers,
+          };
+        });
+        setShowNextButton(true);
+      }, 1000);
+    }, 2500);
   };
 
   const triggerConfetti = () => {
@@ -513,6 +526,49 @@ export default function App() {
               animate={{ x: 0, opacity: 1 }}
               className="glass-card p-8 min-h-[160px] flex flex-col justify-center text-center relative overflow-hidden"
             >
+              <AnimatePresence>
+                {isWaiting && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-navy/90 backdrop-blur-md"
+                  >
+                    <div className="scan-line" />
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <motion.div
+                          animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                          className="w-12 h-12 rounded-full border border-marigold/30 flex items-center justify-center"
+                        >
+                          <div className="w-2 h-2 rounded-full bg-marigold shadow-[0_0_10px_#FACC15]" />
+                        </motion.div>
+                      </div>
+                      <div className="space-y-1">
+                        <motion.p 
+                          animate={{ opacity: [0.5, 1, 0.5] }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                          className="text-marigold font-bold uppercase tracking-[0.4em] text-[10px]"
+                        >
+                          Evaluating
+                        </motion.p>
+                        <div className="flex gap-1 justify-center">
+                          {[0, 1, 2].map(i => (
+                            <motion.div
+                              key={i}
+                              animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
+                              transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+                              className="w-1 h-1 rounded-full bg-marigold"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <h3 className="text-2xl font-bold leading-tight tracking-tight text-navy font-poppins">
                 {questions[currentQuestionIndex].text}
               </h3>
@@ -529,10 +585,12 @@ export default function App() {
                   <button
                     key={i}
                     onClick={() => handleAnswer(i)}
-                    disabled={isRevealing}
+                    disabled={isRevealing || isWaiting}
                     className={cn(
                       "w-full p-4 rounded-2xl text-left font-bold transition-all duration-300 border flex items-center justify-between group",
-                      !showResult && "bg-white/50 border-navy/5 hover:bg-white hover:border-navy/20 active:scale-[0.98] text-navy",
+                      !showResult && !isWaiting && "bg-white/50 border-navy/5 hover:bg-white hover:border-navy/20 active:scale-[0.98] text-navy",
+                      !showResult && isWaiting && isSelected && "bg-navy border-navy text-marigold shadow-lg shadow-navy/20 animate-pulse",
+                      !showResult && isWaiting && !isSelected && "opacity-50 border-transparent text-navy",
                       showResult && isSelected && isCorrect && "bg-success/10 border-success text-success",
                       showResult && isSelected && !isCorrect && "bg-error/10 border-error text-error",
                       showResult && !isSelected && isCorrect && "bg-success/5 border-success/30 text-success/40",
