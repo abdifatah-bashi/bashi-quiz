@@ -127,8 +127,8 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
           <Users className="w-8 h-8 text-marigold" />
           <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-error animate-pulse border-2 border-white" />
         </div>
-        <h2 className="text-4xl font-black uppercase tracking-tighter text-navy font-poppins">Next Round Quiz</h2>
-        <p className="text-navy/40 font-medium tracking-[0.2em] uppercase text-[10px]">Live Selection Arena</p>
+        <h2 className="text-4xl font-black uppercase tracking-tighter text-white font-poppins">Next Round Quiz</h2>
+        <p className="text-white/40 font-medium tracking-[0.2em] uppercase text-[10px]">Live Selection Arena</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8 items-start">
@@ -140,7 +140,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
         >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-black uppercase tracking-widest text-navy/60 flex items-center gap-2">
+              <h3 className="text-sm font-black uppercase tracking-widest text-white/60 flex items-center gap-2">
                 <Users className="w-4 h-4" />
                 Participants ({participants.length})
               </h3>
@@ -166,19 +166,19 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
             <div className="flex flex-col gap-3">
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-navy/30" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                   <input
                     type="text"
                     placeholder="Name..."
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && addParticipant()}
-                    className="w-full bg-navy/5 border border-navy/10 rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-marigold transition-colors font-medium text-sm"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-marigold transition-colors font-medium text-sm text-white"
                   />
                 </div>
                 <button 
                   onClick={addParticipant}
-                  className="bg-navy text-white p-3 rounded-xl hover:bg-navy/90 transition-all active:scale-95"
+                  className="bg-marigold text-navy p-3 rounded-xl hover:bg-marigold/90 transition-all active:scale-95"
                 >
                   <Plus className="w-5 h-5" />
                 </button>
@@ -193,17 +193,17 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className="flex items-center justify-between p-3 bg-white border border-navy/5 rounded-xl group hover:border-navy/20 transition-all"
+                    className="flex items-center justify-between p-3 bg-white/5 border border-white/5 rounded-xl group hover:border-marigold/30 transition-all"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-[10px] text-navy bg-marigold shadow-sm">
                         {getInitials(p.name)}
                       </div>
-                      <span className="font-bold text-navy text-sm">{p.name}</span>
+                      <span className="font-bold text-white text-sm">{p.name}</span>
                     </div>
                     <button 
                       onClick={() => removeParticipant(p.id)}
-                      className="text-navy/20 hover:text-error transition-colors p-1"
+                      className="text-white/20 hover:text-error transition-colors p-1"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -211,7 +211,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                 ))}
               </AnimatePresence>
               {participants.length === 0 && (
-                <div className="text-center py-8 text-navy/20 italic text-sm">
+                <div className="text-center py-8 text-white/20 italic text-sm">
                   No participants added yet
                 </div>
               )}
@@ -251,7 +251,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
           className="space-y-6"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-black uppercase tracking-widest text-navy/60 flex items-center gap-2">
+            <h3 className="text-sm font-black uppercase tracking-widest text-white/60 flex items-center gap-2">
               <Trophy className="w-4 h-4" />
               Arena Matchups
             </h3>
@@ -260,7 +260,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                 <>
                   <button 
                     onClick={copyMatchups}
-                    className="text-[10px] font-bold uppercase tracking-widest text-navy/40 hover:text-navy transition-colors"
+                    className="text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors"
                   >
                     Copy
                   </button>
@@ -293,9 +293,9 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                       transition={{ delay: idx * 0.1 }}
                       className="relative"
                     >
-                      <div className="glass-card overflow-hidden p-8 flex flex-col items-center gap-6 border-navy/10 hover:border-marigold/30 transition-all group">
+                      <div className="glass-card overflow-hidden p-8 flex flex-col items-center gap-6 border-white/10 hover:border-marigold/30 transition-all group">
                         {/* Battle Arena Background */}
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(250,204,21,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,191,36,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity" />
                         
                         <div className="flex items-center justify-center gap-12 relative z-10 w-full">
                           {/* Participant 1 */}
@@ -312,7 +312,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                               "w-24 h-24 rounded-full flex items-center justify-center font-black text-2xl border-4 transition-all duration-500 relative shadow-lg",
                               match.winnerId === match.p1?.id 
                                 ? "bg-success border-success text-white scale-110 shadow-[0_0_30px_rgba(16,185,129,0.4)]" 
-                                : "bg-white border-marigold text-navy group-hover/p:scale-105 group-hover/p:shadow-[0_0_20px_rgba(250,204,21,0.3)]"
+                                : "bg-navy border-marigold text-white group-hover/p:scale-105 group-hover/p:shadow-[0_0_20px_rgba(255,191,36,0.3)]"
                             )}>
                               <div className="absolute inset-1 rounded-full border border-dashed opacity-40 border-marigold" />
                               {getInitials(match.p1?.name || '')}
@@ -330,7 +330,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                               "font-black uppercase tracking-widest text-xs transition-colors px-3 py-1 rounded-full",
                               match.winnerId === match.p1?.id 
                                 ? "bg-success text-white" 
-                                : "bg-navy/5 text-navy"
+                                : "bg-white/5 text-white"
                             )}>
                               {match.p1?.name}
                             </span>
@@ -338,15 +338,15 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
 
                           {/* VS Element */}
                           <div className="relative flex flex-col items-center">
-                            <div className="w-px h-16 bg-navy/5" />
+                            <div className="w-px h-16 bg-white/5" />
                             <motion.div 
                               animate={isShuffling ? { scale: [1, 1.2, 1] } : {}}
                               transition={{ repeat: Infinity, duration: 0.5 }}
-                              className="w-12 h-12 rounded-full midnight-royal flex items-center justify-center text-marigold font-black text-xs shadow-xl shadow-navy/20 z-10 my-2"
+                              className="w-12 h-12 rounded-full midnight-royal flex items-center justify-center text-marigold font-black text-xs shadow-xl shadow-black/50 z-10 my-2"
                             >
                               VS
                             </motion.div>
-                            <div className="w-px h-16 bg-navy/5" />
+                            <div className="w-px h-16 bg-white/5" />
                           </div>
 
                           {/* Participant 2 */}
@@ -365,7 +365,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                               "w-24 h-24 rounded-full flex items-center justify-center font-black text-2xl border-4 transition-all duration-500 relative shadow-lg",
                               match.winnerId === match.p2?.id 
                                 ? "bg-success border-success text-white scale-110 shadow-[0_0_30_rgba(16,185,129,0.4)]" 
-                                : "bg-white border-marigold text-navy group-hover/p:scale-105 group-hover/p:shadow-[0_0_20px_rgba(250,204,21,0.3)]",
+                                : "bg-navy border-marigold text-white group-hover/p:scale-105 group-hover/p:shadow-[0_0_20px_rgba(255,191,36,0.3)]",
                               !match.p2 && "opacity-20 grayscale shadow-none"
                             )}>
                               <div className="absolute inset-1 rounded-full border border-dashed opacity-40 border-marigold" />
@@ -384,7 +384,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                               "font-black uppercase tracking-widest text-xs transition-colors px-3 py-1 rounded-full",
                               match.winnerId === match.p2?.id 
                                 ? "bg-success text-white" 
-                                : "bg-navy/5 text-navy"
+                                : "bg-white/5 text-white"
                             )}>
                               {match.p2?.name || <span className="opacity-30 italic">BYE</span>}
                             </span>
@@ -392,7 +392,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                         </div>
 
                         {/* Action Label */}
-                        <div className="mt-4 text-[9px] font-black uppercase tracking-[0.3em] text-navy/20 group-hover:text-marigold transition-colors">
+                        <div className="mt-4 text-[9px] font-black uppercase tracking-[0.3em] text-white/20 group-hover:text-marigold transition-colors">
                           {match.winnerId ? "Selected for Next Round" : "Tap to Select"}
                         </div>
                       </div>
@@ -404,12 +404,12 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                   key="placeholder"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="glass-card p-16 text-center space-y-4 border-dashed border-navy/10 bg-transparent"
+                  className="glass-card p-16 text-center space-y-4 border-dashed border-white/10 bg-transparent"
                 >
-                  <div className="w-20 h-20 rounded-full bg-navy/5 mx-auto flex items-center justify-center">
-                    <Users className="w-10 h-10 text-navy/10" />
+                  <div className="w-20 h-20 rounded-full bg-white/5 mx-auto flex items-center justify-center">
+                    <Users className="w-10 h-10 text-white/10" />
                   </div>
-                  <p className="text-sm font-bold text-navy/30 uppercase tracking-widest max-w-[200px] mx-auto">
+                  <p className="text-sm font-bold text-white/30 uppercase tracking-widest max-w-[200px] mx-auto">
                     Add participants and generate the draw to enter the Arena
                   </p>
                 </motion.div>

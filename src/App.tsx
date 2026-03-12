@@ -333,19 +333,19 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-start pt-24 p-4 relative overflow-x-hidden">
       {/* Live Indicator */}
-      <div className="absolute top-6 left-6 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 border border-navy/10 backdrop-blur-md shadow-sm accent-glow">
+      <div className="absolute top-6 left-6 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full bg-navy/80 border border-white/10 backdrop-blur-md shadow-sm accent-glow">
         <div className="w-2 h-2 rounded-full bg-error animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-        <span className="text-[10px] font-bold uppercase tracking-widest text-navy/80">Live</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Live</span>
       </div>
 
       {/* Navigation Tabs */}
       {(gameState === 'LOBBY' || gameState === 'TOURNAMENT') && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 flex items-center p-1 bg-white/80 border border-navy/10 backdrop-blur-md rounded-2xl shadow-sm">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 flex items-center p-1 bg-navy/80 border border-white/10 backdrop-blur-md rounded-2xl shadow-sm">
           <button
             onClick={() => setGameState('LOBBY')}
             className={cn(
               "px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2",
-              gameState === 'LOBBY' ? "bg-navy text-white shadow-lg shadow-navy/20" : "text-navy/40 hover:text-navy"
+              gameState === 'LOBBY' ? "bg-marigold text-navy shadow-lg shadow-marigold/20" : "text-white/40 hover:text-white"
             )}
           >
             <Play className="w-4 h-4" />
@@ -355,7 +355,7 @@ export default function App() {
             onClick={() => setGameState('TOURNAMENT')}
             className={cn(
               "px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2",
-              gameState === 'TOURNAMENT' ? "bg-navy text-white shadow-lg shadow-navy/20" : "text-navy/40 hover:text-navy"
+              gameState === 'TOURNAMENT' ? "bg-marigold text-navy shadow-lg shadow-marigold/20" : "text-white/40 hover:text-white"
             )}
           >
             <Users className="w-4 h-4" />
@@ -368,18 +368,18 @@ export default function App() {
       {(gameState === 'LOBBY' || gameState === 'TOURNAMENT') && (
         <button 
           onClick={() => setGameState('ADMIN')}
-          className="absolute top-6 right-6 z-50 p-3 rounded-full bg-white/80 border border-navy/10 backdrop-blur-md shadow-sm hover:bg-white transition-colors text-navy/40 hover:text-navy"
+          className="absolute top-6 right-6 z-50 p-3 rounded-full bg-navy/80 border border-white/10 backdrop-blur-md shadow-sm hover:bg-navy transition-colors text-white/40 hover:text-white"
         >
           <Settings className="w-5 h-5" />
         </button>
       )}
 
       {/* Decorative Icons */}
-      <div className="absolute top-10 right-10 opacity-5 rotate-12">
-        <Moon className="w-32 h-32 text-navy" />
+      <div className="absolute top-10 right-10 opacity-10 rotate-12">
+        <Moon className="w-32 h-32 text-marigold" />
       </div>
-      <div className="absolute bottom-10 left-10 opacity-5 -rotate-12">
-        <Star className="w-24 h-24 text-navy" />
+      <div className="absolute bottom-10 left-10 opacity-10 -rotate-12">
+        <Star className="w-24 h-24 text-marigold" />
       </div>
 
       <AnimatePresence mode="wait">
@@ -404,22 +404,22 @@ export default function App() {
             className="w-full max-w-md glass-card p-8 space-y-8 relative z-10 neon-glow"
           >
             <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-[2rem] midnight-royal mb-6 shadow-2xl shadow-navy/20 relative accent-glow">
-                <Moon className="w-12 h-12 text-white fill-white" />
-                <Star className="w-5 h-5 text-white absolute top-5 right-5 fill-white opacity-50" />
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-[2rem] midnight-royal mb-6 shadow-2xl shadow-black/50 relative accent-glow">
+                <Moon className="w-12 h-12 text-marigold fill-marigold" />
+                <Star className="w-5 h-5 text-marigold absolute top-5 right-5 fill-marigold opacity-50" />
               </div>
-              <h1 className="text-6xl font-extrabold tracking-tighter uppercase text-navy font-poppins">
-                Ramadan <span className="text-navy/30">Quiz</span>
+              <h1 className="text-6xl font-extrabold tracking-tighter uppercase text-white font-poppins">
+                Ramadan <span className="text-marigold">Quiz</span>
               </h1>
-              <p className="text-navy/40 font-medium tracking-[0.2em] uppercase text-[10px]">Premium Live Trivia Experience</p>
+              <p className="text-white/60 font-medium tracking-[0.2em] uppercase text-[10px]">Premium Live Trivia Experience</p>
             </div>
 
             <div className="space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-xs font-bold uppercase tracking-widest text-navy/40">Student Name</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-white/40">Student Name</label>
                   {contestants.length > 0 && (
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-navy/20">Select below or type</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/20">Select below or type</span>
                   )}
                 </div>
                 
@@ -435,13 +435,13 @@ export default function App() {
                         className={cn(
                           "flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border transition-all",
                           student.name === c.name 
-                            ? "bg-navy border-navy text-white shadow-md" 
-                            : "bg-white border-navy/10 text-navy hover:border-navy/30"
+                            ? "bg-marigold border-marigold text-navy shadow-md" 
+                            : "bg-white/5 border-white/10 text-white hover:border-marigold/30"
                         )}
                       >
                         <div className={cn(
                           "w-6 h-6 rounded-lg flex items-center justify-center text-[8px] font-black",
-                          student.name === c.name ? "bg-white/20" : "bg-marigold text-navy"
+                          student.name === c.name ? "bg-navy/20" : "bg-marigold text-navy"
                         )}>
                           {getInitials(c.name)}
                         </div>
@@ -452,20 +452,20 @@ export default function App() {
                 )}
 
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-navy/30" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
                   <input
                     type="text"
                     placeholder="Enter student name..."
                     value={student.name}
                     onChange={(e) => setStudent(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full bg-navy/5 border border-navy/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-steel transition-colors font-medium text-navy placeholder:text-navy/20"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-marigold transition-colors font-medium text-white placeholder:text-white/20"
                   />
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-xs font-bold uppercase tracking-widest text-navy/40">Select Question Set</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-white/40">Select Question Set</label>
                   <button 
                     onClick={resetUsedSets}
                     className="text-[10px] font-bold uppercase tracking-widest text-marigold hover:text-marigold/80 transition-colors flex items-center gap-1"
@@ -487,8 +487,8 @@ export default function App() {
                         className={cn(
                           "relative h-14 rounded-2xl border-2 transition-all duration-300 flex items-center justify-center px-4 text-center group overflow-hidden",
                           isSelected 
-                            ? "bg-marigold border-marigold text-black shadow-[0_10px_20px_-5px_rgba(250,204,21,0.4)] scale-[1.02] z-10" 
-                            : "bg-white border-navy/10 text-black hover:border-navy hover:shadow-md",
+                            ? "bg-marigold border-marigold text-navy shadow-[0_10px_20px_-5px_rgba(255,191,36,0.4)] scale-[1.02] z-10" 
+                            : "bg-white/5 border-white/10 text-white hover:border-marigold hover:shadow-md",
                           isUsed && "opacity-50 border-error/30 bg-error/5 cursor-not-allowed"
                         )}
                       >
@@ -528,8 +528,8 @@ export default function App() {
               </button>
             </div>
 
-            <div className="pt-6 border-t border-navy/5">
-              <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.1em] text-navy/30">
+            <div className="pt-6 border-t border-white/5">
+              <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.1em] text-white/30">
                 <span>4 Questions</span>
                 <span className="text-success bg-success/10 px-3 py-1 rounded-full">3/4 to Pass</span>
                 <span className="opacity-50">Elite Edition</span>
@@ -546,19 +546,19 @@ export default function App() {
             exit={{ opacity: 0, scale: 0.95 }}
             className="w-full max-w-4xl glass-card p-8 space-y-8 relative z-10 max-h-[85vh] overflow-y-auto"
           >
-            <div className="flex items-center justify-between border-b border-navy/5 pb-4">
+            <div className="flex items-center justify-between border-b border-white/5 pb-4">
               <div className="flex items-center gap-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-navy font-poppins">Admin</h2>
-                  <p className="text-xs font-bold uppercase tracking-widest text-navy/40">Control Center</p>
+                  <h2 className="text-2xl font-bold text-white font-poppins">Admin</h2>
+                  <p className="text-xs font-bold uppercase tracking-widest text-white/40">Control Center</p>
                 </div>
                 
-                <div className="flex bg-navy/5 p-1 rounded-xl">
+                <div className="flex bg-white/5 p-1 rounded-xl">
                   <button
                     onClick={() => setAdminTab('QUESTIONS')}
                     className={cn(
                       "px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
-                      adminTab === 'QUESTIONS' ? "bg-white text-navy shadow-sm" : "text-navy/40 hover:text-navy/60"
+                      adminTab === 'QUESTIONS' ? "bg-white text-navy shadow-sm" : "text-white/40 hover:text-white/60"
                     )}
                   >
                     Questions
@@ -567,7 +567,7 @@ export default function App() {
                     onClick={() => setAdminTab('CONTESTANTS')}
                     className={cn(
                       "px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
-                      adminTab === 'CONTESTANTS' ? "bg-white text-navy shadow-sm" : "text-navy/40 hover:text-navy/60"
+                      adminTab === 'CONTESTANTS' ? "bg-white text-navy shadow-sm" : "text-white/40 hover:text-white/60"
                     )}
                   >
                     Contestants
@@ -576,7 +576,7 @@ export default function App() {
               </div>
               <button 
                 onClick={() => setGameState('LOBBY')}
-                className="p-2 rounded-xl hover:bg-navy/5 transition-colors text-navy/40 hover:text-navy"
+                className="p-2 rounded-xl hover:bg-white/5 transition-colors text-white/40 hover:text-white"
               >
                 <XCircle className="w-6 h-6" />
               </button>
@@ -585,7 +585,7 @@ export default function App() {
             {adminTab === 'QUESTIONS' ? (
               <div className="space-y-12">
                 {questionSets.map((set, setIndex) => (
-                  <div key={set.id} className="space-y-6 p-6 rounded-3xl bg-navy/5 border border-navy/10">
+                  <div key={set.id} className="space-y-6 p-6 rounded-3xl bg-white/5 border border-white/10">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 max-w-xs">
                         <input
@@ -596,7 +596,7 @@ export default function App() {
                             newSets[setIndex].name = e.target.value;
                             saveSets(newSets);
                           }}
-                          className="text-xl font-bold text-navy bg-transparent border-b border-navy/10 focus:border-navy outline-none w-full"
+                          className="text-xl font-bold text-white bg-transparent border-b border-white/10 focus:border-marigold outline-none w-full"
                           placeholder="Set Name"
                         />
                       </div>
@@ -616,12 +616,12 @@ export default function App() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {set.questions.map((q, qIndex) => (
-                        <div key={q.id} className="p-4 rounded-2xl bg-white border border-navy/5 space-y-4">
+                        <div key={q.id} className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-4">
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <div className="text-[10px] font-bold uppercase tracking-widest text-navy/30">Question {qIndex + 1}</div>
+                              <div className="text-[10px] font-bold uppercase tracking-widest text-white/30">Question {qIndex + 1}</div>
                               <div className="flex items-center gap-2">
-                                <label className="cursor-pointer p-1.5 rounded-lg bg-navy/5 hover:bg-navy/10 transition-colors text-navy/40 hover:text-navy">
+                                <label className="cursor-pointer p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/40 hover:text-white">
                                   <Upload className="w-3.5 h-3.5" />
                                   <input 
                                     type="file" 
@@ -645,7 +645,7 @@ export default function App() {
                             </div>
 
                             {q.imageUrl && (
-                              <div className="relative w-full h-24 rounded-xl overflow-hidden border border-navy/5 mb-2">
+                              <div className="relative w-full h-24 rounded-xl overflow-hidden border border-white/5 mb-2">
                                 <img src={q.imageUrl} className="w-full h-full object-cover" alt="Preview" referrerPolicy="no-referrer" />
                               </div>
                             )}
@@ -659,7 +659,7 @@ export default function App() {
                                 saveSets(newSets);
                               }}
                               placeholder="Question text..."
-                              className="w-full bg-navy/5 border border-navy/5 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-navy/20 font-medium text-navy"
+                              className="w-full bg-white/5 border border-white/5 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-marigold transition-colors font-medium text-white"
                             />
                           </div>
                           <div className="space-y-2">
@@ -673,7 +673,7 @@ export default function App() {
                                   }}
                                   className={cn(
                                     "w-6 h-6 rounded-lg flex items-center justify-center text-[8px] font-mono border transition-all",
-                                    q.correctIndex === oIndex ? "bg-success border-success text-white" : "bg-white border-navy/10 text-navy/30 hover:border-navy/30"
+                                    q.correctIndex === oIndex ? "bg-success border-success text-white" : "bg-white/5 border-white/10 text-white/30 hover:border-marigold/30"
                                   )}
                                 >
                                   {String.fromCharCode(65 + oIndex)}
@@ -687,7 +687,7 @@ export default function App() {
                                     saveSets(newSets);
                                   }}
                                   placeholder={`Option ${String.fromCharCode(65 + oIndex)}`}
-                                  className="flex-1 bg-navy/5 border border-navy/5 rounded-xl py-1.5 px-3 text-xs font-medium text-navy"
+                                  className="flex-1 bg-white/5 border border-white/5 rounded-xl py-1.5 px-3 text-xs font-medium text-white"
                                 />
                               </div>
                             ))}
@@ -698,13 +698,13 @@ export default function App() {
                   </div>
                 ))}
 
-                <div className="flex gap-3 pt-6 border-t border-navy/5">
+                <div className="flex gap-3 pt-6 border-t border-white/5">
                   <button
                     onClick={() => {
                       const newSets = [...questionSets, createEmptySet(questionSets.length + 1)];
                       saveSets(newSets);
                     }}
-                    className="flex-1 bg-navy/5 hover:bg-navy/10 py-4 rounded-2xl font-bold uppercase tracking-widest text-navy transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 bg-white/5 hover:bg-white/10 py-4 rounded-2xl font-bold uppercase tracking-widest text-white transition-colors flex items-center justify-center gap-2"
                   >
                     <Plus className="w-5 h-5" />
                     Add New Set
@@ -720,8 +720,8 @@ export default function App() {
               </div>
             ) : (
               <div className="space-y-8">
-                <div className="glass-card p-6 bg-navy/5 border-navy/10 space-y-6">
-                  <h3 className="text-sm font-black uppercase tracking-widest text-navy/60">Add New Contestant</h3>
+                <div className="glass-card p-6 bg-white/5 border-white/10 space-y-6">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-white/60">Add New Contestant</h3>
                   <div className="flex flex-wrap gap-4">
                     <div className="flex-1 min-w-[200px]">
                       <input
@@ -730,12 +730,12 @@ export default function App() {
                         onChange={(e) => setNewContestant(prev => ({ ...prev, name: e.target.value }))}
                         onKeyDown={(e) => e.key === 'Enter' && addContestant()}
                         placeholder="Full Name..."
-                        className="w-full bg-white border border-navy/10 rounded-xl py-3 px-4 focus:outline-none focus:border-marigold transition-colors font-medium text-sm"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:border-marigold transition-colors font-medium text-sm text-white"
                       />
                     </div>
                     <button
                       onClick={addContestant}
-                      className="bg-navy text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest hover:bg-navy/90 transition-all active:scale-95 flex items-center gap-2"
+                      className="bg-marigold text-navy px-8 py-3 rounded-xl font-bold uppercase tracking-widest hover:bg-marigold/90 transition-all active:scale-95 flex items-center gap-2"
                     >
                       <Plus className="w-5 h-5" />
                       Add
@@ -752,14 +752,14 @@ export default function App() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
-                        className="p-4 rounded-2xl border bg-white border-navy/10 hover:border-marigold/30 flex items-center gap-4 group transition-all"
+                        className="p-4 rounded-2xl border bg-white/5 border-white/10 hover:border-marigold/30 flex items-center gap-4 group transition-all"
                       >
                         <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-sm shadow-sm bg-marigold text-navy">
                           {getInitials(c.name)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-navy truncate">{c.name}</p>
-                          <p className="text-[8px] font-black uppercase tracking-widest text-navy/30">
+                          <p className="font-bold text-white truncate">{c.name}</p>
+                          <p className="text-[8px] font-black uppercase tracking-widest text-white/30">
                             Contestant
                           </p>
                         </div>
@@ -775,9 +775,9 @@ export default function App() {
                 </div>
 
                 {contestants.length === 0 && (
-                  <div className="text-center py-20 glass-card border-dashed border-navy/10 bg-transparent">
-                    <Users className="w-12 h-12 text-navy/10 mx-auto mb-4" />
-                    <p className="text-sm font-bold text-navy/30 uppercase tracking-widest">No contestants added yet</p>
+                  <div className="text-center py-20 glass-card border-dashed border-white/10 bg-transparent">
+                    <Users className="w-12 h-12 text-white/10 mx-auto mb-4" />
+                    <p className="text-sm font-bold text-white/30 uppercase tracking-widest">No contestants added yet</p>
                   </div>
                 )}
               </div>
@@ -794,7 +794,7 @@ export default function App() {
             className="w-full max-w-md space-y-8 relative z-10 neon-glow"
           >
             {/* HUD Header */}
-            <div className="grid grid-cols-3 items-center bg-navy rounded-2xl px-6 py-3 shadow-2xl shadow-navy/40 border border-white/5">
+            <div className="grid grid-cols-3 items-center bg-navy rounded-2xl px-6 py-3 shadow-2xl shadow-black/50 border border-white/5">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-marigold flex items-center justify-center font-bold text-navy shadow-lg text-sm">
                   {student.name.charAt(0).toUpperCase()}
@@ -822,7 +822,7 @@ export default function App() {
                         fill="none"
                         strokeWidth="6"
                         strokeLinecap="round"
-                        stroke={timeLeft <= 5 ? "#ef4444" : "#FACC15"}
+                        stroke={timeLeft <= 5 ? "#ef4444" : "#ffbf24"}
                       />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -850,9 +850,9 @@ export default function App() {
                   key={i}
                   className={cn(
                     "h-1.5 flex-1 rounded-full transition-all duration-500",
-                    i === currentQuestionIndex ? "bg-navy/40" : 
+                    i === currentQuestionIndex ? "bg-white/40" : 
                     answer === true ? "bg-success" :
-                    answer === false ? "bg-error" : "bg-navy/5"
+                    answer === false ? "bg-error" : "bg-white/5"
                   )}
                 />
               ))}
@@ -881,7 +881,7 @@ export default function App() {
                           transition={{ duration: 1, repeat: Infinity }}
                           className="w-12 h-12 rounded-full border border-marigold/30 flex items-center justify-center"
                         >
-                          <div className="w-2 h-2 rounded-full bg-marigold shadow-[0_0_10px_#FACC15]" />
+                          <div className="w-2 h-2 rounded-full bg-marigold shadow-[0_0_10px_#ffbf24]" />
                         </motion.div>
                       </div>
                       <div className="space-y-1">
@@ -908,7 +908,7 @@ export default function App() {
                 )}
               </AnimatePresence>
 
-              <h3 className="text-2xl font-bold leading-tight tracking-tight text-navy font-poppins">
+              <h3 className="text-2xl font-bold leading-tight tracking-tight text-white font-poppins">
                 {questions[currentQuestionIndex].text}
               </h3>
 
@@ -916,7 +916,7 @@ export default function App() {
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 rounded-2xl overflow-hidden border border-navy/5 shadow-inner bg-navy/5"
+                  className="mt-6 rounded-2xl overflow-hidden border border-white/5 shadow-inner bg-white/5"
                 >
                   <img 
                     src={questions[currentQuestionIndex].imageUrl} 
@@ -942,20 +942,20 @@ export default function App() {
                     disabled={isRevealing || isWaiting || !isTimerStarted}
                     className={cn(
                       "w-full p-4 rounded-2xl text-left font-bold transition-all duration-300 border flex items-center justify-between group",
-                      !showResult && !isWaiting && isTimerStarted && "bg-white/50 border-navy/5 hover:bg-white hover:border-navy/20 active:scale-[0.98] text-navy",
-                      !showResult && !isWaiting && !isTimerStarted && "bg-white/20 border-navy/5 text-navy/30 cursor-not-allowed",
-                      !showResult && isWaiting && isSelected && "bg-navy border-navy text-marigold shadow-lg shadow-navy/20 animate-pulse",
-                      !showResult && isWaiting && !isSelected && "opacity-50 border-transparent text-navy",
+                      !showResult && !isWaiting && isTimerStarted && "bg-white/5 border-white/5 hover:bg-white/10 hover:border-marigold/20 active:scale-[0.98] text-white",
+                      !showResult && !isWaiting && !isTimerStarted && "bg-white/5 border-white/5 text-white/30 cursor-not-allowed",
+                      !showResult && isWaiting && isSelected && "bg-marigold border-marigold text-navy shadow-lg shadow-marigold/20 animate-pulse",
+                      !showResult && isWaiting && !isSelected && "opacity-50 border-transparent text-white",
                       showResult && isSelected && isCorrect && "bg-success/10 border-success text-success",
                       showResult && isSelected && !isCorrect && "bg-error/10 border-error text-error",
                       showResult && !isSelected && isCorrect && "bg-success/5 border-success/30 text-success/40",
-                      showResult && !isSelected && !isCorrect && "opacity-20 border-transparent text-navy"
+                      showResult && !isSelected && !isCorrect && "opacity-20 border-transparent text-white"
                     )}
                   >
                     <span className="flex items-center gap-4">
                       <span className={cn(
                         "w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-mono border transition-colors",
-                        isSelected ? "bg-navy text-white" : "border-navy/10 text-navy/30 group-hover:border-navy/20"
+                        isSelected ? "bg-marigold text-navy" : "border-white/10 text-white/30 group-hover:border-marigold/20"
                       )}>
                         {String.fromCharCode(65 + i)}
                       </span>
@@ -1010,7 +1010,7 @@ export default function App() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     onClick={handleNext}
-                    className="flex-1 bg-navy py-4 rounded-2xl font-bold text-white uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-navy/20"
+                    className="flex-1 bg-marigold py-4 rounded-2xl font-bold text-navy uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-marigold/20"
                   >
                     {currentQuestionIndex < 3 ? "Next Question" : "View Results"}
                     <ChevronRight className="w-5 h-5" />
@@ -1033,21 +1033,21 @@ export default function App() {
             <div className="space-y-4">
               <div className={cn(
                 "w-24 h-24 rounded-3xl mx-auto flex items-center justify-center shadow-2xl",
-                student.score >= 3 ? "midnight-royal shadow-navy/20" : "bg-navy/5"
+                student.score >= 3 ? "midnight-royal shadow-black/50" : "bg-white/5"
               )}>
                 {student.score >= 3 ? (
-                  <Trophy className="w-12 h-12 text-white" />
+                  <Trophy className="w-12 h-12 text-marigold" />
                 ) : (
-                  <Moon className="w-12 h-12 text-navy/20" />
+                  <Moon className="w-12 h-12 text-white/20" />
                 )}
               </div>
               
               <div className="space-y-1">
-                <h2 className="text-4xl font-bold uppercase tracking-tighter text-navy font-poppins">
+                <h2 className="text-4xl font-bold uppercase tracking-tighter text-white font-poppins">
                   {student.score >= 3 ? "Trivia Master!" : "Ramadan Kareem!"}
                 </h2>
-                <p className="text-navy/50 font-medium">
-                  {student.name} scored <span className="text-navy font-bold">{student.score}/4</span>
+                <p className="text-white/50 font-medium">
+                  {student.name} scored <span className="text-marigold font-bold">{student.score}/4</span>
                 </p>
               </div>
             </div>
@@ -1057,7 +1057,7 @@ export default function App() {
                 <div key={i} className={cn(
                   "aspect-square rounded-xl flex items-center justify-center border",
                   ans === true ? "bg-success/10 border-success/30 text-success" : 
-                  ans === false ? "bg-error/10 border-error/30 text-error" : "bg-navy/5 border-navy/10"
+                  ans === false ? "bg-error/10 border-error/30 text-error" : "bg-white/5 border-white/10"
                 )}>
                   {ans === true ? <CheckCircle2 className="w-5 h-5" /> : ans === false ? <XCircle className="w-5 h-5" /> : null}
                 </div>
@@ -1065,7 +1065,7 @@ export default function App() {
             </div>
 
             <div className="space-y-3">
-              <p className="text-sm font-medium text-navy/60 italic">
+              <p className="text-sm font-medium text-white/60 italic">
                 {student.score >= 3 
                   ? "Outstanding! Your knowledge of Ramadan is truly impressive." 
                   : "A great effort! Ramadan is a time for learning and reflection."}
@@ -1073,7 +1073,7 @@ export default function App() {
               
               <button
                 onClick={resetGame}
-                className="w-full bg-navy text-white py-4 rounded-2xl font-bold uppercase tracking-widest hover:bg-navy/90 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-navy/20"
+                className="w-full bg-marigold text-navy py-4 rounded-2xl font-bold uppercase tracking-widest hover:bg-marigold/90 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-marigold/20"
               >
                 <RotateCcw className="w-5 h-5" />
                 Next Student
@@ -1085,7 +1085,7 @@ export default function App() {
 
       {/* Footer / Branding */}
       <div className="absolute bottom-6 left-0 w-full text-center pointer-events-none opacity-10">
-        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-navy">Ramadan Broadcast System v3.0</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white">Ramadan Broadcast System v3.0</p>
       </div>
     </div>
   );
