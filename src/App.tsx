@@ -521,10 +521,10 @@ export default function App() {
               <button
                 onClick={startNewGame}
                 disabled={!student.name.trim() || !selectedSetId}
-                className="w-full glass-button py-6 rounded-2xl font-extrabold text-xl uppercase tracking-[0.15em] flex items-center justify-center gap-3 text-marigold"
+                className="w-full py-6 rounded-2xl font-black text-2xl uppercase tracking-[0.2em] flex items-center justify-center gap-3 text-white bg-gradient-to-br from-[#10B981] to-[#065f46] shadow-[0_20px_40px_-12px_rgba(16,185,129,0.4)] hover:brightness-110 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed accent-glow border border-white/10"
               >
-                <Play className="w-6 h-6 fill-current" />
-                Start Trivia
+                <Play className="w-7 h-7 fill-white" />
+                BISMILLAH
               </button>
             </div>
 
@@ -994,10 +994,10 @@ export default function App() {
                           startTimer();
                           soundService.playPop();
                         }}
-                        className="flex-[2] bg-success hover:bg-success/90 border border-success py-4 rounded-2xl font-black text-white uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-success/20"
+                        className="flex-[2] bg-gradient-to-br from-[#10B981] to-[#065f46] hover:brightness-110 border border-white/10 py-4 rounded-2xl font-black text-white uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-success/20"
                       >
-                        <Play className="w-5 h-5" />
-                        Start
+                        <Play className="w-5 h-5 fill-white" />
+                        START
                       </button>
                     )}
                   </motion.div>
