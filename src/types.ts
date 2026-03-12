@@ -19,4 +19,9 @@ export interface Student {
   answers: (boolean | null)[];
 }
 
-export type GameState = 'LOBBY' | 'PLAYING' | 'RESULT' | 'ADMIN';
+export interface Contestant {
+  id: string;
+  name: string;
+}
+
+export type GameState = 'LOBBY' | 'PLAYING' | 'RESULT' | 'ADMIN' | 'TOURNAMENT';

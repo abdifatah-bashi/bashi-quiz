@@ -51,6 +51,12 @@ class SoundService {
     // A slightly more urgent tick - Louder and longer
     this.playTone(1200, 'sine', 0.15, 0.2);
   }
+
+  playPop() {
+    // A high-pitched "pop" sound
+    this.playTone(1000, 'sine', 0.1, 0.3);
+    setTimeout(() => this.playTone(1500, 'sine', 0.1, 0.3), 50);
+  }
 }
 
 export const soundService = new SoundService();
