@@ -9,6 +9,7 @@ export interface Question {
 export interface QuestionSet {
   id: string;
   name: string;
+  type: 'NORMAL' | 'RAPID';
   questions: Question[];
   isUsed?: boolean;
 }
