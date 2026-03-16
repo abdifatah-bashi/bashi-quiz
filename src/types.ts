@@ -25,4 +25,10 @@ export interface Contestant {
   name: string;
 }
 
-export type GameState = 'LOBBY' | 'PLAYING' | 'RESULT' | 'ADMIN' | 'TOURNAMENT';
+export interface FinalScore {
+  contestantId: string;
+  normalScore: number;
+  rapidScore: number;
+}
+
+export type GameState = 'LOBBY' | 'PLAYING' | 'RESULT' | 'ADMIN' | 'TOURNAMENT' | 'FINAL';

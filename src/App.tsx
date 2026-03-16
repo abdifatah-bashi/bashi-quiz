@@ -6,6 +6,7 @@ import { Question, Student, GameState, QuestionSet, Contestant } from './types';
 import { cn } from './utils';
 import { soundService } from './services/soundService';
 import TournamentDraw from './components/TournamentDraw';
+import FinalRound from './components/FinalRound';
 
 
 const INITIAL_SETS: QuestionSet[] = [
@@ -227,7 +228,7 @@ export default function App() {
       return;
     }
 
-    const duration = selectedSet.type === 'RAPID' ? 50 : 20;
+    const duration = selectedSet.type === 'RAPID' ? 60 : 20;
     setGameTimerDuration(duration);
     setTimeLeft(duration);
 
@@ -329,21 +330,6 @@ export default function App() {
       .slice(0, 2);
   };
 
-  const [newContestant, setNewContestant] = useState<{ name: string }>({
-    name: ''
-  });
-
-  const addContestant = () => {
-    if (!newContestant.name.trim()) return;
-    const contestant: Contestant = {
-      id: `c-${Date.now()}`,
-      name: newContestant.name.trim()
-    };
-    saveContestants([...contestants, contestant]);
-    setNewContestant({ name: '' });
-    soundService.playPop();
-  };
-
   const removeContestant = (id: string) => {
     saveContestants(contestants.filter(c => c.id !== id));
     soundService.playPop();
@@ -416,7 +402,7 @@ export default function App() {
       </div>
 
       {/* Navigation Tabs */}
-      {(gameState === 'LOBBY' || gameState === 'TOURNAMENT') && (
+      {(gameState === 'LOBBY' || gameState === 'TOURNAMENT' || gameState === 'FINAL') && (
         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 flex items-center p-1 bg-navy/80 border border-white/10 backdrop-blur-md rounded-2xl shadow-sm">
           <button
             onClick={() => setGameState('LOBBY')}
@@ -437,6 +423,16 @@ export default function App() {
           >
             <Users className="w-4 h-4" />
             Next Round
+          </button>
+          <button
+            onClick={() => setGameState('FINAL')}
+            className={cn(
+              "px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2",
+              gameState === 'FINAL' ? "bg-marigold text-navy shadow-lg shadow-marigold/20" : "text-white/40 hover:text-white"
+            )}
+          >
+            <Trophy className="w-4 h-4" />
+            Final
           </button>
         </div>
       )}
@@ -853,29 +849,6 @@ export default function App() {
               </div>
             ) : (
               <div className="space-y-8">
-                <div className="glass-card p-6 bg-white/5 border-white/10 space-y-6">
-                  <h3 className="text-sm font-black uppercase tracking-widest text-white/60">Add New Contestant</h3>
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex-1 min-w-[200px]">
-                      <input
-                        type="text"
-                        value={newContestant.name}
-                        onChange={(e) => setNewContestant(prev => ({ ...prev, name: e.target.value }))}
-                        onKeyDown={(e) => e.key === 'Enter' && addContestant()}
-                        placeholder="Full Name..."
-                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:border-marigold transition-colors font-medium text-sm text-white"
-                      />
-                    </div>
-                    <button
-                      onClick={addContestant}
-                      className="bg-marigold text-navy px-8 py-3 rounded-xl font-bold uppercase tracking-widest hover:bg-marigold/90 transition-all active:scale-95 flex items-center gap-2"
-                    >
-                      <Plus className="w-5 h-5" />
-                      Add
-                    </button>
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <AnimatePresence mode="popLayout">
                     {contestants.map((c) => (
@@ -1180,6 +1153,21 @@ export default function App() {
 
             {/* Start Quiz Overlay Removed */}
           </motion.div>
+        )}
+
+        {gameState === 'FINAL' && (
+          <FinalRound 
+            contestants={contestants} 
+            onAddContestant={(name) => {
+              const contestant: Contestant = {
+                id: `c-${Date.now()}`,
+                name: name.trim()
+              };
+              saveContestants([...contestants, contestant]);
+            }}
+            onRemoveContestant={removeContestant}
+            onBack={() => setGameState('LOBBY')} 
+          />
         )}
 
         {gameState === 'RESULT' && (
