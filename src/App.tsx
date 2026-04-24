@@ -481,8 +481,8 @@ export default function App() {
                 <Moon className="w-12 h-12 text-marigold fill-marigold" />
                 <Star className="w-5 h-5 text-marigold absolute top-5 right-5 fill-marigold opacity-50" />
               </div>
-              <h1 className="text-6xl font-extrabold tracking-tighter uppercase text-white font-poppins">
-                Ramadan <span className="text-marigold">Quiz</span>
+              <h1 className="text-4xl font-extrabold tracking-tighter uppercase text-white font-poppins">
+                Bashi Academy <span className="text-marigold">Quiz</span>
               </h1>
               <p className="text-white/60 font-medium tracking-[0.2em] uppercase text-[10px]">Premium Live Trivia Experience</p>
             </div>
