@@ -127,7 +127,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
           <Users className="w-8 h-8 text-marigold" />
           <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-error animate-pulse border-2 border-white" />
         </div>
-        <h2 className="text-4xl font-black uppercase tracking-tighter text-white font-poppins">Next Round Quiz</h2>
+        <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Next Round Quiz</h2>
         <p className="text-white/40 font-medium tracking-[0.2em] uppercase text-[10px]">Live Selection Arena</p>
       </div>
 
@@ -295,7 +295,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                     >
                       <div className="glass-card overflow-hidden p-8 flex flex-col items-center gap-6 border-white/10 hover:border-marigold/30 transition-all group">
                         {/* Battle Arena Background */}
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,191,36,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(248,107,66,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity" />
                         
                         <div className="flex items-center justify-center gap-12 relative z-10 w-full">
                           {/* Participant 1 */}
@@ -312,7 +312,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                               "w-24 h-24 rounded-full flex items-center justify-center font-black text-2xl border-4 transition-all duration-500 relative shadow-lg",
                               match.winnerId === match.p1?.id 
                                 ? "bg-success border-success text-white scale-110 shadow-[0_0_30px_rgba(16,185,129,0.4)]" 
-                                : "bg-navy border-marigold text-white group-hover/p:scale-105 group-hover/p:shadow-[0_0_20px_rgba(255,191,36,0.3)]"
+                                : "bg-navy border-marigold text-white group-hover/p:scale-105 group-hover/p:shadow-[0_0_20px_rgba(248,107,66,0.3)]"
                             )}>
                               <div className="absolute inset-1 rounded-full border border-dashed opacity-40 border-marigold" />
                               {getInitials(match.p1?.name || '')}
@@ -365,7 +365,7 @@ export default function TournamentDraw({ adminContestants = [] }: TournamentDraw
                               "w-24 h-24 rounded-full flex items-center justify-center font-black text-2xl border-4 transition-all duration-500 relative shadow-lg",
                               match.winnerId === match.p2?.id 
                                 ? "bg-success border-success text-white scale-110 shadow-[0_0_30_rgba(16,185,129,0.4)]" 
-                                : "bg-navy border-marigold text-white group-hover/p:scale-105 group-hover/p:shadow-[0_0_20px_rgba(255,191,36,0.3)]",
+                                : "bg-navy border-marigold text-white group-hover/p:scale-105 group-hover/p:shadow-[0_0_20px_rgba(248,107,66,0.3)]",
                               !match.p2 && "opacity-20 grayscale shadow-none"
                             )}>
                               <div className="absolute inset-1 rounded-full border border-dashed opacity-40 border-marigold" />

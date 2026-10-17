@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Moon, User, Play, RotateCcw, CheckCircle2, XCircle, Timer, Star, ChevronRight, Settings, Save, Plus, Trash2, List, Loader2, Image as ImageIcon, Upload, X, Users, Swords } from 'lucide-react';
+import { Trophy, Zap, User, Play, RotateCcw, CheckCircle2, XCircle, Timer, Star, ChevronRight, Settings, Save, Plus, Trash2, List, Loader2, Image as ImageIcon, Upload, X, Users, Swords } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Question, Student, GameState, QuestionSet, Contestant } from './types';
 import { cn } from './utils';
@@ -9,33 +9,45 @@ import TournamentDraw from './components/TournamentDraw';
 import FinalRound from './components/FinalRound';
 
 
+const SHOW_NEXT_ROUND_TAB = false;
+
+const LOBBY_LABEL = "block text-xs font-semibold uppercase tracking-[0.15em] text-white/50";
+
+const PRIMARY_BUTTON = "rounded-2xl font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-3 border-2 border-marigold text-marigold transition-all active:scale-[0.98] enabled:hover:bg-marigold enabled:hover:text-navy enabled:hover:shadow-[0_20px_40px_-12px_rgba(248,107,66,0.6)] disabled:opacity-40 disabled:cursor-not-allowed";
+
+const STORAGE_KEYS = {
+  sets: 'himma_quiz_sets',
+  usedSets: 'himma_quiz_used_sets',
+  contestants: 'himma_quiz_contestants',
+};
+
 const INITIAL_SETS: QuestionSet[] = [
   {
     id: 'set-1',
-    name: 'Ramadan Basics',
+    name: 'General Knowledge',
     type: 'NORMAL',
     questions: [
-      { id: '1-1', text: "What is the pre-dawn meal before fasting called?", options: ["Iftar", "Suhoor", "Taraweeh"], correctIndex: 1 },
-      { id: '1-2', text: "Which month of the Islamic calendar is Ramadan?", options: ["7th", "8th", "9th"], correctIndex: 2 },
-      { id: '1-3', text: "What is the night of power called?", options: ["Laylat al-Qadr", "Eid al-Fitr", "Ashura"], correctIndex: 0 },
-      { id: '1-4', text: "What do Muslims traditionally eat to break their fast?", options: ["Bread", "Dates", "Olives"], correctIndex: 1 }
+      { id: '1-1', text: "What is the largest planet in our solar system?", options: ["Saturn", "Jupiter", "Neptune"], correctIndex: 1 },
+      { id: '1-2', text: "How many continents are there?", options: ["5", "6", "7"], correctIndex: 2 },
+      { id: '1-3', text: "What gas do plants absorb from the air?", options: ["Carbon dioxide", "Oxygen", "Nitrogen"], correctIndex: 0 },
+      { id: '1-4', text: "What is the longest river in Africa?", options: ["Congo", "Nile", "Niger"], correctIndex: 1 }
     ]
   },
   {
     id: 'set-rapid-1',
-    name: 'Rapid Fire: Ramadan',
+    name: 'Rapid Fire: General Knowledge',
     type: 'RAPID',
     questions: [
-      { id: 'r-1', text: "Ramadan is the 9th month of the Islamic calendar.", options: ["True", "False"], correctIndex: 0 },
-      { id: 'r-2', text: "Fasting is one of the Five Pillars of Islam.", options: ["True", "False"], correctIndex: 0 },
-      { id: 'r-3', text: "The pre-dawn meal is called Iftar.", options: ["True", "False"], correctIndex: 1 },
-      { id: 'r-4', text: "Laylat al-Qadr is in the last 10 days of Ramadan.", options: ["True", "False"], correctIndex: 0 },
-      { id: 'r-5', text: "Muslims fast from sunrise to sunset.", options: ["True", "False"], correctIndex: 1 },
-      { id: 'r-6', text: "Eid al-Fitr marks the end of Ramadan.", options: ["True", "False"], correctIndex: 0 },
-      { id: 'r-7', text: "Zakat al-Fitr is given before Eid prayer.", options: ["True", "False"], correctIndex: 0 },
-      { id: 'r-8', text: "The Quran was first revealed in Ramadan.", options: ["True", "False"], correctIndex: 0 },
-      { id: 'r-9', text: "Taraweeh is an obligatory prayer.", options: ["True", "False"], correctIndex: 1 },
-      { id: 'r-10', text: "Children are required to fast.", options: ["True", "False"], correctIndex: 1 }
+      { id: 'r-1', text: "Water boils at 100°C at sea level.", options: ["True", "False"], correctIndex: 0 },
+      { id: 'r-2', text: "The sun is a star.", options: ["True", "False"], correctIndex: 0 },
+      { id: 'r-3', text: "Spiders are insects.", options: ["True", "False"], correctIndex: 1 },
+      { id: 'r-4', text: "The Pacific is the largest ocean on Earth.", options: ["True", "False"], correctIndex: 0 },
+      { id: 'r-5', text: "Humans have three lungs.", options: ["True", "False"], correctIndex: 1 },
+      { id: 'r-6', text: "Light travels faster than sound.", options: ["True", "False"], correctIndex: 0 },
+      { id: 'r-7', text: "A triangle has four sides.", options: ["True", "False"], correctIndex: 1 },
+      { id: 'r-8', text: "Mount Everest is the tallest mountain above sea level.", options: ["True", "False"], correctIndex: 0 },
+      { id: 'r-9', text: "Bats are blind.", options: ["True", "False"], correctIndex: 1 },
+      { id: 'r-10', text: "The human heart has four chambers.", options: ["True", "False"], correctIndex: 0 }
     ]
   }
 ];
@@ -64,11 +76,11 @@ export default function App() {
   });
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionSets, setQuestionSets] = useState<QuestionSet[]>(() => {
-    const saved = localStorage.getItem('ramadan_quiz_sets');
+    const saved = localStorage.getItem(STORAGE_KEYS.sets);
     return saved ? JSON.parse(saved) : INITIAL_SETS;
   });
   const [selectedSetId, setSelectedSetId] = useState<string>(() => {
-    const saved = localStorage.getItem('ramadan_quiz_sets');
+    const saved = localStorage.getItem(STORAGE_KEYS.sets);
     const sets = saved ? JSON.parse(saved) : INITIAL_SETS;
     return sets[0]?.id || '';
   });
@@ -86,12 +98,12 @@ export default function App() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [usedSetIds, setUsedSetIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('ramadan_quiz_used_sets');
+    const saved = localStorage.getItem(STORAGE_KEYS.usedSets);
     return saved ? JSON.parse(saved) : [];
   });
 
   const [contestants, setContestants] = useState<Contestant[]>(() => {
-    const saved = localStorage.getItem('ramadan_quiz_contestants');
+    const saved = localStorage.getItem(STORAGE_KEYS.contestants);
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -99,21 +111,21 @@ export default function App() {
 
   const saveContestants = (newContestants: Contestant[]) => {
     setContestants(newContestants);
-    localStorage.setItem('ramadan_quiz_contestants', JSON.stringify(newContestants));
+    localStorage.setItem(STORAGE_KEYS.contestants, JSON.stringify(newContestants));
   };
 
   const markSetAsUsed = (id: string) => {
     setUsedSetIds(prev => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
-      localStorage.setItem('ramadan_quiz_used_sets', JSON.stringify(next));
+      localStorage.setItem(STORAGE_KEYS.usedSets, JSON.stringify(next));
       return next;
     });
   };
 
   const resetUsedSets = () => {
     setUsedSetIds([]);
-    localStorage.removeItem('ramadan_quiz_used_sets');
+    localStorage.removeItem(STORAGE_KEYS.usedSets);
   };
 
   const stopTimer = useCallback(() => {
@@ -246,37 +258,6 @@ export default function App() {
     }
   };
 
-  const handleSkip = () => {
-    const selectedSet = questionSets.find(s => s.id === selectedSetId);
-    if (selectedSet?.type === 'NORMAL') {
-      stopTimer();
-    }
-    soundService.playPop();
-    
-    setStudent(prev => {
-      const newAnswers = [...prev.answers];
-      newAnswers[currentQuestionIndex] = false;
-      return {
-        ...prev,
-        answers: newAnswers,
-      };
-    });
-
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setSelectedOption(null);
-      setIsWaiting(false);
-      setIsRevealing(false);
-      setShowNextButton(false);
-      if (selectedSet?.type === 'NORMAL') {
-        setIsTimerStarted(false);
-        setTimeLeft(gameTimerDuration);
-      }
-    } else {
-      setGameState('RESULT');
-    }
-  };
-
   const handleAnswer = (index: number) => {
     if (isRevealing || isWaiting) return;
     
@@ -365,7 +346,7 @@ export default function App() {
 
   const saveSets = (newSets: QuestionSet[]) => {
     setQuestionSets(newSets);
-    localStorage.setItem('ramadan_quiz_sets', JSON.stringify(newSets));
+    localStorage.setItem(STORAGE_KEYS.sets, JSON.stringify(newSets));
   };
 
   const handleImageUpload = (setIndex: number, qIndex: number, file: File) => {
@@ -414,16 +395,18 @@ export default function App() {
             <Play className="w-4 h-4" />
             Quiz
           </button>
-          <button
-            onClick={() => setGameState('TOURNAMENT')}
-            className={cn(
-              "px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2",
-              gameState === 'TOURNAMENT' ? "bg-marigold text-navy shadow-lg shadow-marigold/20" : "text-white/40 hover:text-white"
-            )}
-          >
-            <Users className="w-4 h-4" />
-            Next Round
-          </button>
+          {SHOW_NEXT_ROUND_TAB && (
+            <button
+              onClick={() => setGameState('TOURNAMENT')}
+              className={cn(
+                "px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2",
+                gameState === 'TOURNAMENT' ? "bg-marigold text-navy shadow-lg shadow-marigold/20" : "text-white/40 hover:text-white"
+              )}
+            >
+              <Users className="w-4 h-4" />
+              Next Round
+            </button>
+          )}
           <button
             onClick={() => setGameState('FINAL')}
             className={cn(
@@ -449,7 +432,7 @@ export default function App() {
 
       {/* Decorative Icons */}
       <div className="absolute top-10 right-10 opacity-10 rotate-12">
-        <Moon className="w-32 h-32 text-marigold" />
+        <Zap className="w-32 h-32 text-marigold" />
       </div>
       <div className="absolute bottom-10 left-10 opacity-10 -rotate-12">
         <Star className="w-24 h-24 text-marigold" />
@@ -474,30 +457,24 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full max-w-md glass-card p-8 space-y-8 relative z-10 neon-glow"
+            className="w-full max-w-md glass-card p-8 sm:p-10 space-y-8 relative z-10 neon-glow"
           >
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-[2rem] midnight-royal mb-6 shadow-2xl shadow-black/50 relative accent-glow">
-                <Moon className="w-12 h-12 text-marigold fill-marigold" />
-                <Star className="w-5 h-5 text-marigold absolute top-5 right-5 fill-marigold opacity-50" />
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl midnight-royal mb-6 shadow-2xl shadow-black/50 accent-glow">
+                <Zap className="w-10 h-10 text-marigold fill-marigold" />
               </div>
-              <h1 className="text-4xl font-extrabold tracking-tighter uppercase text-white font-poppins">
-                Bashi Academy <span className="text-marigold">Quiz</span>
+              <h1 className="text-4xl font-extrabold tracking-tight uppercase text-white">
+                Himma <span className="text-marigold">Quiz</span>
               </h1>
-              <p className="text-white/60 font-medium tracking-[0.2em] uppercase text-[10px]">Premium Live Trivia Experience</p>
+              <p className="mt-3 text-sm text-white/50">Live trivia, one student at a time</p>
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between ml-1">
-                  <label className="text-xs font-bold uppercase tracking-widest text-white/40">Student Name</label>
-                  {contestants.length > 0 && (
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/20">Select below or type</span>
-                  )}
-                </div>
+            <div className="space-y-7">
+              <div className="space-y-3">
+                <label className={LOBBY_LABEL}>Student</label>
                 
                 {contestants.length > 0 && (
-                  <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar no-scrollbar">
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
                     {contestants.map(c => (
                       <button
                         key={c.id}
@@ -506,19 +483,19 @@ export default function App() {
                           soundService.playPop();
                         }}
                         className={cn(
-                          "flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border transition-all",
+                          "flex-shrink-0 flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full border transition-all",
                           student.name === c.name 
                             ? "bg-marigold border-marigold text-navy shadow-md" 
-                            : "bg-white/5 border-white/10 text-white hover:border-marigold/30"
+                            : "bg-white/5 border-white/10 text-white hover:border-marigold/40"
                         )}
                       >
                         <div className={cn(
-                          "w-6 h-6 rounded-lg flex items-center justify-center text-[8px] font-black",
-                          student.name === c.name ? "bg-navy/20" : "bg-marigold text-navy"
+                          "w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold",
+                          student.name === c.name ? "bg-navy/20" : "bg-marigold/15 text-marigold"
                         )}>
                           {getInitials(c.name)}
                         </div>
-                        <span className="text-[11px] font-bold truncate max-w-[80px]">{c.name}</span>
+                        <span className="text-sm font-semibold truncate max-w-[100px]">{c.name}</span>
                       </button>
                     ))}
                   </div>
@@ -528,26 +505,28 @@ export default function App() {
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
                   <input
                     type="text"
-                    placeholder="Enter student name..."
+                    placeholder={contestants.length > 0 ? "Or type a name..." : "Enter student name..."}
                     value={student.name}
                     onChange={(e) => setStudent(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-marigold transition-colors font-medium text-white placeholder:text-white/20"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-marigold transition-colors font-medium text-white placeholder:text-white/30"
                   />
                 </div>
               </div>
 
               <div className="space-y-3">
-                <div className="flex items-center justify-between ml-1">
-                  <label className="text-xs font-bold uppercase tracking-widest text-white/40">Select Question Set</label>
-                  <button 
-                    onClick={resetUsedSets}
-                    className="text-[10px] font-bold uppercase tracking-widest text-marigold hover:text-marigold/80 transition-colors flex items-center gap-1"
-                  >
-                    <RotateCcw className="w-3 h-3" />
-                    Reset Used
-                  </button>
+                <div className="flex items-center justify-between">
+                  <label className={LOBBY_LABEL}>Question Set</label>
+                  {usedSetIds.length > 0 && (
+                    <button 
+                      onClick={resetUsedSets}
+                      className="text-xs font-semibold text-marigold hover:text-marigold/80 transition-colors flex items-center gap-1.5"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      Reset used
+                    </button>
+                  )}
                 </div>
-                <div className="grid grid-cols-2 gap-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar py-2">
+                <div className="grid grid-cols-2 gap-3 max-h-[220px] overflow-y-auto custom-scrollbar">
                   {questionSets.map((set) => {
                     const isUsed = usedSetIds.includes(set.id);
                     const isSelected = selectedSetId === set.id;
@@ -558,16 +537,15 @@ export default function App() {
                         disabled={isUsed}
                         onClick={() => setSelectedSetId(set.id)}
                         className={cn(
-                          "relative h-14 rounded-2xl border-2 transition-all duration-300 flex items-center justify-center px-4 text-center group overflow-hidden",
+                          "relative min-h-16 rounded-2xl border-2 transition-all duration-300 flex items-center justify-center px-4 py-3 text-center overflow-hidden",
                           isSelected 
-                            ? "bg-marigold border-marigold text-navy shadow-[0_10px_20px_-5px_rgba(255,191,36,0.4)] scale-[1.02] z-10" 
-                            : "bg-white/5 border-white/10 text-white hover:border-marigold hover:shadow-md",
+                            ? "bg-marigold/10 border-marigold text-marigold" 
+                            : "bg-white/5 border-white/10 text-white/70 hover:border-marigold/50 hover:text-white",
                           isUsed && "opacity-50 border-error/30 bg-error/5 cursor-not-allowed"
                         )}
                       >
                         <span className={cn(
-                          "text-[12px] font-black uppercase tracking-tight leading-tight transition-all",
-                          isSelected ? "scale-105" : "group-hover:scale-105",
+                          "text-sm font-semibold leading-snug",
                           isUsed && "text-error/60 line-through decoration-error decoration-2"
                         )}>
                           {set.name}
@@ -576,13 +554,6 @@ export default function App() {
                         {isUsed && (
                           <div className="absolute top-0 right-0 p-1">
                             <div className="w-2 h-2 rounded-full bg-error shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
-                          </div>
-                        )}
-                        
-                        {/* Elegant Shine effect on selected */}
-                        {isSelected && (
-                          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
                           </div>
                         )}
                       </button>
@@ -594,20 +565,22 @@ export default function App() {
               <button
                 onClick={startNewGame}
                 disabled={!student.name.trim() || !selectedSetId}
-                className="w-full py-6 rounded-2xl font-black text-2xl uppercase tracking-[0.2em] flex items-center justify-center gap-3 text-white bg-gradient-to-br from-[#10B981] to-[#065f46] shadow-[0_20px_40px_-12px_rgba(16,185,129,0.4)] hover:brightness-110 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed accent-glow border border-white/10"
+                className={cn(PRIMARY_BUTTON, "group w-full py-5 text-xl")}
               >
-                <Play className="w-7 h-7 fill-white" />
+                <Play className="w-6 h-6 fill-current transition-transform group-enabled:group-hover:translate-x-0.5" />
                 BISMILLAH
               </button>
             </div>
 
-            <div className="pt-6 border-t border-white/5">
-              <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.1em] text-white/30">
-                <span>4 Questions</span>
-                <span className="text-success bg-success/10 px-3 py-1 rounded-full">3/4 to Pass</span>
-                <span className="opacity-50">Elite Edition</span>
+            {selectedSet && (
+              <div className="pt-6 border-t border-white/5 flex items-center justify-center gap-3 text-sm text-white/40">
+                <span>{selectedSet.questions.length} questions</span>
+                <span className="w-1 h-1 rounded-full bg-white/20" />
+                <span className="text-success">
+                  {Math.ceil(selectedSet.questions.length * 0.75)}/{selectedSet.questions.length} to pass
+                </span>
               </div>
-            </div>
+            )}
           </motion.div>
         )}
 
@@ -622,7 +595,7 @@ export default function App() {
             <div className="flex items-center justify-between border-b border-white/5 pb-4">
               <div className="flex items-center gap-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-white font-poppins">Admin</h2>
+                  <h2 className="text-2xl font-bold text-white">Admin</h2>
                   <p className="text-xs font-bold uppercase tracking-widest text-white/40">Control Center</p>
                 </div>
                 
@@ -897,28 +870,27 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.1 }}
-            className="w-full max-w-md space-y-8 relative z-10 neon-glow"
+            className="w-full max-w-xl space-y-6 relative z-10 neon-glow"
           >
             {/* HUD Header */}
-            <div className="grid grid-cols-3 items-center bg-navy rounded-2xl px-6 py-3 shadow-2xl shadow-black/50 border border-white/5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-marigold flex items-center justify-center font-bold text-navy shadow-lg text-sm">
+            <div className="grid grid-cols-3 items-center bg-navy rounded-3xl px-6 py-4 shadow-2xl shadow-black/50 border border-white/5">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 shrink-0 rounded-full bg-marigold/15 text-marigold flex items-center justify-center font-bold">
                   {student.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/50">Student</p>
-                  <p className="font-bold leading-tight text-white truncate text-sm">{student.name}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/40">Student</p>
+                  <p className="font-heading font-bold leading-tight text-white truncate">{student.name}</p>
                 </div>
               </div>
 
               {/* Center Timer */}
               <div className="flex justify-center">
-                <div className="relative w-16 h-16">
-                  <div className="circular-timer !w-16 !h-16">
-                    <svg width="64" height="64" viewBox="0 0 100 100">
+                <div className="relative w-24 h-24 shrink-0">
+                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
                       <circle className="stroke-white/10" cx="50" cy="50" r={radius} fill="none" strokeWidth="6" />
                       <motion.circle
-                        className={cn("progress", timeLeft <= 5 && "warning")}
+                        transform="rotate(-90 50 50)"
                         cx="50"
                         cy="50"
                         r={radius}
@@ -928,37 +900,36 @@ export default function App() {
                         fill="none"
                         strokeWidth="6"
                         strokeLinecap="round"
-                        stroke={timeLeft <= 5 ? "#ef4444" : "#ffbf24"}
+                        stroke={timeLeft <= 5 ? "#ef4444" : "#f86b42"}
                       />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className={cn(
-                        "text-2xl font-bold font-mono",
+                        "font-heading text-3xl font-bold tabular-nums",
                         timeLeft <= 5 ? "text-error" : "text-white"
                       )}>
                         {timeLeft}
                       </span>
                     </div>
-                  </div>
                 </div>
               </div>
 
               <div className="text-right">
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/50">Question</p>
-                <p className="font-mono font-bold text-xl text-white">{currentQuestionIndex + 1}<span className="opacity-30">/{questions.length}</span></p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/40">Question</p>
+                <p className="font-heading font-bold text-2xl text-white tabular-nums">{currentQuestionIndex + 1}<span className="text-white/30">/{questions.length}</span></p>
               </div>
             </div>
 
             {/* Progress Dots */}
-            <div className="flex gap-2 justify-center">
+            <div className="flex gap-1.5 justify-center px-1">
               {student.answers.map((answer, i) => (
                 <div
                   key={i}
                   className={cn(
-                    "h-1.5 flex-1 rounded-full transition-all duration-500",
-                    i === currentQuestionIndex ? "bg-white/40" : 
+                    "h-1 flex-1 rounded-full transition-all duration-500",
+                    i === currentQuestionIndex ? "bg-marigold" : 
                     answer === true ? "bg-success" :
-                    answer === false ? "bg-error" : "bg-white/5"
+                    answer === false ? "bg-error" : "bg-white/10"
                   )}
                 />
               ))}
@@ -972,10 +943,10 @@ export default function App() {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -20, opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="space-y-8"
+                className="space-y-6"
               >
                 {/* Question Card */}
-                <div className="glass-card p-8 min-h-[160px] flex flex-col justify-center text-center relative overflow-hidden">
+                <div className="glass-card px-8 py-10 sm:px-10 min-h-[180px] flex flex-col justify-center text-center relative overflow-hidden">
                   <AnimatePresence>
                     {isWaiting && (
                       <motion.div 
@@ -992,7 +963,7 @@ export default function App() {
                               transition={{ duration: 1, repeat: Infinity }}
                               className="w-12 h-12 rounded-full border border-marigold/30 flex items-center justify-center"
                             >
-                              <div className="w-2 h-2 rounded-full bg-marigold shadow-[0_0_10px_#ffbf24]" />
+                              <div className="w-2 h-2 rounded-full bg-marigold shadow-[0_0_10px_#f86b42]" />
                             </motion.div>
                           </div>
                           <div className="space-y-1">
@@ -1020,7 +991,7 @@ export default function App() {
                   </AnimatePresence>
 
                   {questions[currentQuestionIndex] ? (
-                    <h3 className="text-2xl font-bold leading-tight tracking-tight text-white font-poppins">
+                    <h3 className="text-2xl sm:text-3xl font-bold leading-snug tracking-tight text-white text-balance">
                       {questions[currentQuestionIndex].text}
                     </h3>
                   ) : (
@@ -1059,9 +1030,9 @@ export default function App() {
                         onClick={() => handleAnswer(i)}
                         disabled={isRevealing || isWaiting || !isTimerStarted}
                         className={cn(
-                          "w-full p-4 rounded-2xl text-left font-bold transition-all duration-300 border flex items-center justify-between group",
-                          !showResult && !isWaiting && isTimerStarted && "bg-white/5 border-white/5 hover:bg-white/10 hover:border-marigold/20 active:scale-[0.98] text-white",
-                          !showResult && !isWaiting && !isTimerStarted && "bg-white/5 border-white/5 text-white/30 cursor-not-allowed",
+                          "w-full px-5 py-4 rounded-2xl text-left text-lg font-semibold transition-all duration-300 border-2 flex items-center justify-between group",
+                          !showResult && !isWaiting && isTimerStarted && "bg-white/5 border-white/10 hover:bg-marigold/10 hover:border-marigold/60 active:scale-[0.98] text-white",
+                          !showResult && !isWaiting && !isTimerStarted && "bg-white/5 border-white/5 text-white/60 cursor-not-allowed",
                           !showResult && isWaiting && isSelected && "bg-marigold border-marigold text-navy shadow-lg shadow-marigold/20 animate-pulse",
                           !showResult && isWaiting && !isSelected && "opacity-50 border-transparent text-white",
                           showResult && isSelected && isCorrect && "bg-success/10 border-success text-success",
@@ -1072,8 +1043,8 @@ export default function App() {
                       >
                         <span className="flex items-center gap-4">
                           <span className={cn(
-                            "w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-mono border transition-colors",
-                            isSelected ? "bg-marigold text-navy" : "border-white/10 text-white/30 group-hover:border-marigold/20"
+                            "w-9 h-9 shrink-0 rounded-xl flex items-center justify-center text-sm font-bold border transition-colors",
+                            isSelected ? "bg-marigold border-marigold text-navy" : "border-white/15 text-white/50 group-enabled:group-hover:border-marigold/60 group-enabled:group-hover:text-marigold"
                           )}>
                             {String.fromCharCode(65 + i)}
                           </span>
@@ -1100,23 +1071,15 @@ export default function App() {
                     exit={{ opacity: 0, y: 10 }}
                     className="flex gap-3 w-full"
                   >
-                    <button
-                      onClick={handleSkip}
-                      className="flex-1 bg-error hover:bg-error/90 border border-error py-4 rounded-2xl font-black text-white uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-error/20"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                      Skip
-                    </button>
-
                     {!isTimerStarted && (
                       <button
                         onClick={() => {
                           startTimer();
                           soundService.playPop();
                         }}
-                        className="flex-[2] bg-gradient-to-br from-[#10B981] to-[#065f46] hover:brightness-110 border border-white/10 py-4 rounded-2xl font-black text-white uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-success/20"
+                        className={cn(PRIMARY_BUTTON, "flex-1 py-4")}
                       >
-                        <Play className="w-5 h-5 fill-white" />
+                        <Play className="w-5 h-5 fill-current" />
                         START
                       </button>
                     )}
@@ -1130,7 +1093,7 @@ export default function App() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       onClick={handleNext}
-                      className="flex-1 bg-marigold py-4 rounded-2xl font-bold text-navy uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-marigold/20"
+                      className={cn(PRIMARY_BUTTON, "flex-1 py-4")}
                     >
                       {currentQuestionIndex < questions.length - 1 ? "Next Question" : "View Results"}
                       <ChevronRight className="w-5 h-5" />
@@ -1185,13 +1148,13 @@ export default function App() {
                 {student.score >= Math.ceil(questions.length * 0.75) ? (
                   <Trophy className="w-12 h-12 text-marigold" />
                 ) : (
-                  <Moon className="w-12 h-12 text-white/20" />
+                  <Zap className="w-12 h-12 text-white/20" />
                 )}
               </div>
               
               <div className="space-y-1">
-                <h2 className="text-4xl font-bold uppercase tracking-tighter text-white font-poppins">
-                  {student.score >= Math.ceil(questions.length * 0.75) ? "Trivia Master!" : "Ramadan Kareem!"}
+                <h2 className="text-4xl font-bold uppercase tracking-tighter text-white">
+                  {student.score >= Math.ceil(questions.length * 0.75) ? "Trivia Master!" : "Well Played!"}
                 </h2>
                 <p className="text-white/50 font-medium">
                   {student.name} scored <span className="text-marigold font-bold">{student.score}/{questions.length}</span>
@@ -1217,8 +1180,8 @@ export default function App() {
             <div className="space-y-3">
               <p className="text-sm font-medium text-white/60 italic">
                 {student.score >= Math.ceil(questions.length * 0.75) 
-                  ? "Outstanding! Your knowledge of Ramadan is truly impressive." 
-                  : "A great effort! Ramadan is a time for learning and reflection."}
+                  ? "Outstanding! Your knowledge is truly impressive." 
+                  : "A great effort! Every quiz is a chance to learn something new."}
               </p>
               
               <button
@@ -1235,7 +1198,7 @@ export default function App() {
 
       {/* Footer / Branding */}
       <div className="absolute bottom-6 left-0 w-full text-center pointer-events-none opacity-10">
-        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white">Ramadan Broadcast System v3.0</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white">Himma Broadcast System v3.0</p>
       </div>
     </div>
   );

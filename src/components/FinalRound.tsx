@@ -1,10 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Medal, Star, Calculator, User, CheckCircle2, Award, Crown, PartyPopper, Plus, Trash2 } from 'lucide-react';
+import { Crown, Plus, Minus, X, Sparkles, RotateCcw } from 'lucide-react';
 import { Contestant, FinalScore } from '../types';
 import { cn } from '../utils';
 import { soundService } from '../services/soundService';
 import confetti from 'canvas-confetti';
+
+const MAX_NORMAL = 4;
+const MAX_RAPID = 8;
 
 interface FinalRoundProps {
   contestants: Contestant[];
@@ -13,14 +16,40 @@ interface FinalRoundProps {
   onBack: () => void;
 }
 
-export default function FinalRound({ contestants, onAddContestant, onRemoveContestant, onBack }: FinalRoundProps) {
+const totalOf = (s: FinalScore) => s.normalScore + s.rapidScore / 2;
+
+interface StepperProps {
+  label: string;
+  value: number;
+  max: number;
+  onChange: (value: number) => void;
+}
+
+function Stepper({ label, value, max, onChange }: StepperProps) {
+  const buttonClass = "w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-20 disabled:hover:bg-transparent";
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">{label}</span>
+      <div className="flex items-center gap-1 bg-white/5 rounded-xl p-1">
+        <button onClick={() => onChange(value - 1)} disabled={value <= 0} className={buttonClass}>
+          <Minus className="w-4 h-4" />
+        </button>
+        <span className="w-8 text-center text-lg font-black text-white tabular-nums">{value}</span>
+        <button onClick={() => onChange(value + 1)} disabled={value >= max} className={buttonClass}>
+          <Plus className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function FinalRound({ contestants, onAddContestant, onRemoveContestant }: FinalRoundProps) {
   const [newContestantName, setNewContestantName] = useState('');
-  const [scores, setScores] = useState<FinalScore[]>(() => 
+  const [scores, setScores] = useState<FinalScore[]>(() =>
     contestants.map(c => ({ contestantId: c.id, normalScore: 0, rapidScore: 0 }))
   );
   const [showResults, setShowResults] = useState(false);
 
-  // Sync scores when contestants change
   React.useEffect(() => {
     setScores(prev => {
       const newScores = [...prev];
@@ -41,31 +70,29 @@ export default function FinalRound({ contestants, onAddContestant, onRemoveConte
   };
 
   const updateScore = (contestantId: string, field: 'normalScore' | 'rapidScore', value: number) => {
-    setScores(prev => prev.map(s => 
+    setScores(prev => prev.map(s =>
       s.contestantId === contestantId ? { ...s, [field]: value } : s
     ));
     soundService.playPop();
   };
 
-  const results = useMemo(() => {
-    const calculated = scores.map(s => {
-      const contestant = contestants.find(c => c.id === s.contestantId);
-      const totalScore = s.normalScore + (s.rapidScore / 2);
-      return {
-        ...s,
-        name: contestant?.name || 'Unknown',
-        totalScore
-      };
-    });
+  const scoreFor = (id: string): FinalScore =>
+    scores.find(s => s.contestantId === id) || { contestantId: id, normalScore: 0, rapidScore: 0 };
 
-    return calculated.sort((a, b) => b.totalScore - a.totalScore);
-  }, [scores, contestants]);
+  const results = useMemo(() =>
+    contestants
+      .map(c => ({ ...scoreFor(c.id), name: c.name, totalScore: totalOf(scoreFor(c.id)) }))
+      .sort((a, b) => b.totalScore - a.totalScore),
+    [scores, contestants]
+  );
 
-  const handleCalculate = () => {
+  const leaderId = results[0]?.totalScore > 0 ? results[0].contestantId : null;
+  const [winner, ...runnersUp] = results;
+
+  const handleReveal = () => {
     setShowResults(true);
     soundService.playCorrect();
-    
-    // Trigger confetti for the winner
+
     const duration = 5 * 1000;
     const animationEnd = Date.now() + duration;
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
@@ -81,218 +108,159 @@ export default function FinalRound({ contestants, onAddContestant, onRemoveConte
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 pb-20">
-      <div className="text-center space-y-4">
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-marigold/10 border border-marigold/20 text-marigold"
-        >
-          <Crown className="w-5 h-5" />
-          <span className="text-sm font-black uppercase tracking-[0.2em]">Grand Finale</span>
-        </motion.div>
-        <h2 className="text-5xl font-black text-white uppercase tracking-tighter">
-          Final <span className="text-marigold">Leaderboard</span>
-        </h2>
-        <p className="text-white/40 max-w-lg mx-auto">
-          Record the scores for the final round. Normal questions count as 1 point, Quickfire questions count as 0.5 points.
-        </p>
-      </div>
-
-      {/* Registration Section */}
-      <div className="glass-card p-4 bg-white/5 border-white/10">
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="flex-1 min-w-[200px]">
-            <input
-              type="text"
-              value={newContestantName}
-              onChange={(e) => setNewContestantName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-              placeholder="Add finalist name..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 focus:outline-none focus:border-marigold transition-colors font-medium text-sm text-white placeholder:text-white/20"
-            />
-          </div>
-          <button
-            onClick={handleAdd}
-            className="bg-marigold text-navy px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-marigold/90 transition-all active:scale-95 flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Add Finalist
-          </button>
-        </div>
-      </div>
-
-      <div className="grid gap-6">
-        {contestants.map((contestant, idx) => {
-          const score = scores.find(s => s.contestantId === contestant.id) || { normalScore: 0, rapidScore: 0 };
-          return (
-            <motion.div
-              key={contestant.id}
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: idx * 0.1 }}
-              className="glass-card p-4 md:p-6 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 group hover:border-marigold/30 transition-all relative"
-            >
-              <button
-                onClick={() => onRemoveContestant(contestant.id)}
-                className="absolute top-2 right-2 md:top-4 md:right-4 p-2 text-error/20 hover:text-error transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-              
-              <div className="flex items-center gap-4 w-full md:w-auto md:min-w-[180px]">
-                <div className="w-10 h-10 rounded-xl midnight-royal flex items-center justify-center text-marigold font-black shadow-lg text-sm shrink-0">
-                  {idx + 1}
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-lg font-bold text-white leading-tight truncate">{contestant.name}</h3>
-                  <p className="text-[9px] text-white/20 uppercase tracking-[0.2em] font-bold">Finalist</p>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row flex-1 flex-wrap gap-4 md:gap-8 items-center md:items-start justify-center md:justify-end w-full">
-                {/* Normal Score */}
-                <div className="space-y-3 p-4 rounded-2xl bg-white/[0.02] border border-white/5 w-full sm:w-auto">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-marigold shadow-[0_0_8px_rgba(255,191,36,0.4)]" />
-                    <label className="text-[10px] font-black text-white/80 uppercase tracking-[0.2em] block">Set 1: Normal</label>
-                  </div>
-                  <div className="grid grid-cols-5 gap-1.5">
-                    {[0, 1, 2, 3, 4].map(val => (
-                      <button
-                        key={val}
-                        onClick={() => updateScore(contestant.id, 'normalScore', val)}
-                        className={cn(
-                          "w-10 h-10 rounded-xl font-black text-base transition-all border-2",
-                          score.normalScore === val 
-                            ? "bg-marigold text-navy border-marigold shadow-[0_0_15px_rgba(255,191,36,0.2)] scale-105 z-10" 
-                            : "bg-white/5 text-white/60 border-white/10 hover:border-marigold/30 hover:bg-white/10"
-                        )}
-                      >
-                        {val}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Rapid Score */}
-                <div className="space-y-3 p-4 rounded-2xl bg-white/[0.02] border border-white/5 w-full sm:w-auto">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                    <label className="text-[10px] font-black text-white/80 uppercase tracking-[0.2em] block">Set 2: Quickfire</label>
-                  </div>
-                  <div className="grid grid-cols-5 gap-1.5">
-                    {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(val => (
-                      <button
-                        key={val}
-                        onClick={() => updateScore(contestant.id, 'rapidScore', val)}
-                        className={cn(
-                          "w-10 h-10 rounded-xl text-sm font-black transition-all border-2",
-                          score.rapidScore === val 
-                            ? "bg-emerald-500 text-white border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.2)] scale-105 z-10" 
-                            : "bg-white/5 text-white/60 border-white/10 hover:border-emerald-500/30 hover:bg-white/10"
-                        )}
-                      >
-                        {val}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      <div className="flex justify-center pt-8">
-        <button
-          onClick={handleCalculate}
-          disabled={showResults}
-          className="group relative px-12 py-6 bg-marigold rounded-3xl font-black text-xl text-navy uppercase tracking-[0.2em] shadow-[0_20px_40px_-12px_rgba(255,191,36,0.4)] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
-        >
-          <div className="flex items-center gap-3">
-            <Calculator className="w-6 h-6" />
-            Calculate Winner
-          </div>
-        </button>
-      </div>
-
-      <AnimatePresence>
-        {showResults && (
+    <div className="w-full max-w-2xl mx-auto pb-20">
+      <AnimatePresence mode="wait">
+        {!showResults ? (
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            key="scoring"
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-12 pt-12"
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-8"
           >
-            <div className="text-center">
-              <h3 className="text-3xl font-black text-white uppercase tracking-tight">Final <span className="text-marigold">Standings</span></h3>
+            <div className="text-center space-y-3">
+              <p className="text-marigold text-xs font-black uppercase tracking-[0.3em]">Grand Finale</p>
+              <h2 className="text-5xl font-black text-white uppercase tracking-tighter">The Final</h2>
+              <p className="text-white/40 text-sm">Normal = 1 pt &middot; Quickfire = ½ pt</p>
             </div>
 
-            <div className="grid gap-4">
-              {results.map((res, idx) => (
-                <motion.div
-                  key={res.contestantId}
-                  initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.2 }}
-                  className={cn(
-                    "relative p-8 rounded-[2.5rem] border flex items-center justify-between overflow-hidden",
-                    idx === 0 
-                      ? "bg-gradient-to-br from-marigold to-orange-600 border-white/20 text-navy shadow-2xl shadow-marigold/20" 
-                      : "glass-card border-white/10 text-white"
-                  )}
-                >
-                  {idx === 0 && (
-                    <div className="absolute top-0 right-0 p-4 opacity-20">
-                      <Crown className="w-32 h-32 -rotate-12" />
-                    </div>
-                  )}
+            <div className="relative">
+              <input
+                type="text"
+                value={newContestantName}
+                onChange={(e) => setNewContestantName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+                placeholder="Add a finalist..."
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-5 pr-14 focus:outline-none focus:border-marigold transition-colors font-medium text-white placeholder:text-white/30"
+              />
+              <button
+                onClick={handleAdd}
+                disabled={!newContestantName.trim()}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-marigold text-navy flex items-center justify-center hover:bg-marigold/90 transition-all active:scale-95 disabled:opacity-30"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
 
-                  <div className="flex items-center gap-6 relative z-10">
-                    <div className={cn(
-                      "w-16 h-16 rounded-3xl flex items-center justify-center text-2xl font-black shadow-xl",
-                      idx === 0 ? "bg-white/20" : "midnight-royal text-marigold"
-                    )}>
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <h4 className="text-2xl font-black uppercase tracking-tight">{res.name}</h4>
-                      <div className="flex gap-4 mt-1">
-                        <span className={cn("text-[10px] font-black uppercase tracking-widest", idx === 0 ? "text-navy/90" : "text-white/80")}>
-                          Normal: {res.normalScore}
-                        </span>
-                        <span className={cn("text-[10px] font-black uppercase tracking-widest", idx === 0 ? "text-navy/90" : "text-white/80")}>
-                          Quickfire: {res.rapidScore} (x0.5)
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-right relative z-10">
-                    <div className="text-4xl font-black tracking-tighter">{res.totalScore}</div>
-                    <div className={cn("text-[10px] font-black uppercase tracking-widest", idx === 0 ? "text-navy/90" : "text-white/80")}>
-                      Total Points
-                    </div>
-                  </div>
-
-                  {idx === 0 && (
+            {contestants.length === 0 ? (
+              <p className="text-center text-white/30 py-12">Add your finalists to get started.</p>
+            ) : (
+              <div className="space-y-3">
+                {contestants.map((contestant, idx) => {
+                  const score = scoreFor(contestant.id);
+                  const isLeader = contestant.id === leaderId;
+                  return (
                     <motion.div
-                      animate={{ rotate: [0, 10, -10, 0] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-10"
+                      key={contestant.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className={cn(
+                        "group relative flex flex-wrap items-center gap-4 sm:gap-6 p-4 pr-12 rounded-2xl border transition-colors",
+                        isLeader ? "bg-marigold/10 border-marigold/40" : "bg-white/[0.03] border-white/10"
+                      )}
                     >
-                      <Trophy className="w-48 h-48" />
+                      <div className="flex items-center gap-3 flex-1 min-w-[140px]">
+                        {isLeader && <Crown className="w-5 h-5 text-marigold shrink-0" />}
+                        <h3 className="text-lg font-bold text-white truncate">{contestant.name}</h3>
+                      </div>
+
+                      <Stepper
+                        label="Normal"
+                        value={score.normalScore}
+                        max={MAX_NORMAL}
+                        onChange={(v) => updateScore(contestant.id, 'normalScore', v)}
+                      />
+                      <Stepper
+                        label="Quickfire"
+                        value={score.rapidScore}
+                        max={MAX_RAPID}
+                        onChange={(v) => updateScore(contestant.id, 'rapidScore', v)}
+                      />
+
+                      <div className="w-14 text-right">
+                        <div className={cn("text-3xl font-black tabular-nums", isLeader ? "text-marigold" : "text-white")}>
+                          {totalOf(score)}
+                        </div>
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-white/30">pts</div>
+                      </div>
+
+                      <button
+                        onClick={() => onRemoveContestant(contestant.id)}
+                        className="absolute top-3 right-3 p-1 text-white/20 hover:text-error transition-all md:opacity-0 md:group-hover:opacity-100"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </motion.div>
-                  )}
+                  );
+                })}
+              </div>
+            )}
+
+            {contestants.length > 0 && (
+              <div className="flex justify-center pt-4">
+                <button
+                  onClick={handleReveal}
+                  className="px-10 py-5 bg-marigold rounded-2xl font-black text-lg text-navy uppercase tracking-[0.2em] shadow-[0_20px_40px_-12px_rgba(248,107,66,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Reveal Winner
+                </button>
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="results"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="space-y-8"
+          >
+            {winner && (
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', bounce: 0.4 }}
+                className="text-center space-y-4 py-8"
+              >
+                <motion.div
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="inline-flex w-24 h-24 rounded-[2rem] midnight-royal items-center justify-center accent-glow"
+                >
+                  <Crown className="w-12 h-12 text-navy" />
                 </motion.div>
-              ))}
-            </div>
+                <p className="text-marigold text-xs font-black uppercase tracking-[0.3em]">Champion</p>
+                <h2 className="text-6xl font-black text-white uppercase tracking-tighter">{winner.name}</h2>
+                <p className="text-2xl font-black text-marigold tabular-nums">{winner.totalScore} pts</p>
+              </motion.div>
+            )}
+
+            {runnersUp.length > 0 && (
+              <div className="space-y-2">
+                {runnersUp.map((res, idx) => (
+                  <motion.div
+                    key={res.contestantId}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 + idx * 0.1 }}
+                    className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/[0.03] border border-white/10"
+                  >
+                    <span className="w-6 text-white/30 font-black tabular-nums">{idx + 2}</span>
+                    <span className="flex-1 font-bold text-white truncate">{res.name}</span>
+                    <span className="font-black text-white tabular-nums">{res.totalScore}</span>
+                  </motion.div>
+                ))}
+              </div>
+            )}
 
             <div className="flex justify-center">
               <button
                 onClick={() => setShowResults(false)}
-                className="text-white/40 hover:text-white text-xs font-bold uppercase tracking-widest transition-all"
+                className="flex items-center gap-2 text-white/40 hover:text-white text-xs font-bold uppercase tracking-widest transition-all"
               >
+                <RotateCcw className="w-4 h-4" />
                 Edit Scores
               </button>
             </div>
